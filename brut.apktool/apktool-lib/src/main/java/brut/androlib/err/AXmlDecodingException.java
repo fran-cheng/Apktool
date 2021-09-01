@@ -18,6 +18,9 @@ package brut.androlib.err;
 
 import brut.androlib.AndrolibException;
 
+/**
+ * 自定义异常
+ */
 public class AXmlDecodingException extends AndrolibException {
     public AXmlDecodingException(String message, Throwable cause) {
         super(message, cause);

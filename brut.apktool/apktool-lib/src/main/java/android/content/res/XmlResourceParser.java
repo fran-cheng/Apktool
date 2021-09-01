@@ -24,6 +24,7 @@ import android.util.AttributeSet;
  * XmlPullParser interface, as well as an extended AttributeSet interface and an
  * additional close() method on this interface for the client to indicate when
  * it is done reading the resource.
+ * 从Android里面拷贝过来的  用XmlPullParser解析AndroidManifest.xml
  */
 public interface XmlResourceParser extends XmlPullParser, AttributeSet {
 	/**

@@ -29,8 +29,12 @@ import org.jf.smali.smaliTreeWalker;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * smali 模型
+ */
 public class SmaliMod {
-    public static boolean assembleSmaliFile(File smaliFile,DexBuilder dexBuilder, int apiLevel, boolean verboseErrors,
+
+    public static boolean assembleSmaliFile(File smaliFile, DexBuilder dexBuilder, int apiLevel, boolean verboseErrors,
                                             boolean printTokens) throws IOException, RecognitionException {
 
         CommonTokenStream tokens;
@@ -46,7 +50,7 @@ public class SmaliMod {
         if (printTokens) {
             tokens.getTokens();
 
-            for (int i=0; i<tokens.size(); i++) {
+            for (int i = 0; i < tokens.size(); i++) {
                 Token token = tokens.get(i);
                 if (token.getChannel() == smaliParser.HIDDEN) {
                     continue;

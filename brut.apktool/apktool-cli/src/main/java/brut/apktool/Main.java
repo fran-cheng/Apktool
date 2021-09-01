@@ -811,14 +811,25 @@ public class Main {
         }
     }
 
+    /**
+     * 是否先行模式
+     *
+     * @return boolean
+     */
     private static boolean isAdvanceMode() {
         return advanceMode;
     }
 
+    /**
+     * 设置先行模式
+     */
     private static void setAdvanceMode() {
         Main.advanceMode = true;
     }
 
+    /**
+     * 日志版本
+     */
     private enum Verbosity {
         NORMAL, VERBOSE, QUIET
     }

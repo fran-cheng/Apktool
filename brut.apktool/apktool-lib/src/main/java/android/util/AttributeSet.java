@@ -15,59 +15,135 @@
  */
 package android.util;
 
+/**
+ * 属性组===>Set
+ * XmlResourceParser
+ * 从Android里面拷贝过来的
+ */
 public interface AttributeSet {
-	int getAttributeCount();
+    int getAttributeCount();
 
-	String getAttributeName(int index);
+    /**
+     * 获得属性名
+     *
+     * @param index 下标
+     * @return String
+     */
+    String getAttributeName(int index);
 
-	String getAttributeValue(int index);
 
-	String getPositionDescription();
+    /**
+     * 获得属性值
+     *
+     * @param index 下标
+     * @return String
+     */
+    String getAttributeValue(int index);
 
-	int getAttributeNameResource(int index);
+    String getPositionDescription();
 
-	int getAttributeListValue(int index, String options[], int defaultValue);
 
-	boolean getAttributeBooleanValue(int index, boolean defaultValue);
+    /**
+     * 获得属性名资源
+     *
+     * @param index 下标
+     * @return int
+     */
+    int getAttributeNameResource(int index);
 
-	int getAttributeResourceValue(int index, int defaultValue);
+    /**
+     * 获取属性集合的值
+     *
+     * @param index        下标
+     * @param options      选项
+     * @param defaultValue 默认值
+     * @return int
+     */
+    int getAttributeListValue(int index, String options[], int defaultValue);
 
-	int getAttributeIntValue(int index, int defaultValue);
+    /**
+     * 获取属性 boolean 类型
+     *
+     * @param index        下标
+     * @param defaultValue 默认值
+     * @return boolean
+     */
+    boolean getAttributeBooleanValue(int index, boolean defaultValue);
 
-	int getAttributeUnsignedIntValue(int index, int defaultValue);
+    /**
+     * 获取属性值
+     *
+     * @param index        下标
+     * @param defaultValue 默认值
+     * @return int
+     */
+    int getAttributeResourceValue(int index, int defaultValue);
 
-	float getAttributeFloatValue(int index, float defaultValue);
+    /**
+     * 获取属性 int 类型
+     *
+     * @param index        下标
+     * @param defaultValue 默认值
+     * @return int
+     */
+    int getAttributeIntValue(int index, int defaultValue);
 
-	String getIdAttribute();
+    /**
+     * 获取属性 无符号 int 类型
+     *
+     * @param index        下标
+     * @param defaultValue 默认值
+     * @return int
+     */
+    int getAttributeUnsignedIntValue(int index, int defaultValue);
 
-	String getClassAttribute();
+    /**
+     * 获取属性 float 类型
+     *
+     * @param index        下标
+     * @param defaultValue 默认值
+     * @return float
+     */
+    float getAttributeFloatValue(int index, float defaultValue);
 
-	int getIdAttributeResourceValue(int index);
+    /**
+     * 获取属性Id
+     * @return String
+     */
+    String getIdAttribute();
 
-	int getStyleAttribute();
+    /**
+     * 获取类属性
+     * @return String
+     */
+    String getClassAttribute();
 
-	String getAttributeValue(String namespace, String attribute);
+    int getIdAttributeResourceValue(int index);
 
-	int getAttributeListValue(String namespace, String attribute,
-			String options[], int defaultValue);
+    int getStyleAttribute();
 
-	boolean getAttributeBooleanValue(String namespace, String attribute,
-			boolean defaultValue);
+    String getAttributeValue(String namespace, String attribute);
 
-	int getAttributeResourceValue(String namespace, String attribute,
-			int defaultValue);
+    int getAttributeListValue(String namespace, String attribute,
+                              String options[], int defaultValue);
 
-	int getAttributeIntValue(String namespace, String attribute,
-			int defaultValue);
+    boolean getAttributeBooleanValue(String namespace, String attribute,
+                                     boolean defaultValue);
 
-	int getAttributeUnsignedIntValue(String namespace, String attribute,
-			int defaultValue);
+    int getAttributeResourceValue(String namespace, String attribute,
+                                  int defaultValue);
 
-	float getAttributeFloatValue(String namespace, String attribute,
-			float defaultValue);
+    int getAttributeIntValue(String namespace, String attribute,
+                             int defaultValue);
 
-	// TODO: remove
-	int getAttributeValueType(int index);
+    int getAttributeUnsignedIntValue(String namespace, String attribute,
+                                     int defaultValue);
 
-	int getAttributeValueData(int index);
+    float getAttributeFloatValue(String namespace, String attribute,
+                                 float defaultValue);
+
+    // TODO: remove
+    int getAttributeValueType(int index);
+
+    int getAttributeValueData(int index);
 }

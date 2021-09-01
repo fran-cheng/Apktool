@@ -25,12 +25,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * apktool.yml 文件内容
+ * 记录相关信息，回编的时候使用
+ */
 public class MetaInfo {
     public String version;
     public String apkFileName;
     public boolean isFrameworkApk;
     public UsesFramework usesFramework;
-    public  Map<String, String> sdkInfo;
+    public Map<String, String> sdkInfo;
     public PackageInfo packageInfo;
     public VersionInfo versionInfo;
     public boolean compressionType;
@@ -57,10 +61,10 @@ public class MetaInfo {
     }
 
     public void save(File file) throws IOException {
-        try(
-                FileOutputStream fos = new FileOutputStream(file);
-                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
-                Writer writer = new BufferedWriter(outputStreamWriter)
+        try (
+            FileOutputStream fos = new FileOutputStream(file);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
+            Writer writer = new BufferedWriter(outputStreamWriter)
         ) {
             save(writer);
         }
