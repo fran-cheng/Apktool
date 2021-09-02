@@ -116,6 +116,7 @@ public class Main {
                 cmdFound = true;
             } else if (opt.equalsIgnoreCase("publicize-resources")) {
 //                PublicizeResources
+//                公开所有的框架资源
                 cmdPublicizeResources(commandLine);
                 cmdFound = true;
             }
@@ -372,6 +373,7 @@ public class Main {
 
     /**
      * PublicizeResources
+     * 公开所有的框架资源
      *
      * @param cli 命令行
      * @throws AndrolibException 自定义 AndrolibException 异常

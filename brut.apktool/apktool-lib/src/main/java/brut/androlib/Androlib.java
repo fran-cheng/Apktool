@@ -330,11 +330,12 @@ public class Androlib {
             Set<String> files = unk.getFiles(true);
             for (String file : files) {
                 if (!isAPKFileNames(file) && !file.endsWith(".dex")) {
-
+//                    非标准APK文件，非dex后缀，拷贝到 unknown
                     // copy file out of archive into special "unknown" folder
                     unk.copyToDir(unknownOut, file);
                     // lets record the name of the file, and its compression type
                     // so that we may re-include it the same way
+//                    添加的未知Res，回编的时候原样塞回去
                     mResUnknownFiles.addUnknownFileInfo(file, String.valueOf(unk.getCompressionLevel(file)));
                 }
             }
@@ -343,6 +344,13 @@ public class Androlib {
         }
     }
 
+    /**
+     * 生成Original文件夹及相关内容
+     *
+     * @param apkFile apkFile
+     * @param outDir  outDir
+     * @throws AndrolibException 自定义异常
+     */
     public void writeOriginalFiles(ExtFile apkFile, File outDir)
         throws AndrolibException {
         LOGGER.info("Copying original files...");
@@ -372,6 +380,13 @@ public class Androlib {
         }
     }
 
+    /**
+     * 生成apktool.yml
+     *
+     * @param mOutDir mOutDir
+     * @param meta    meta
+     * @throws AndrolibException 自定义异常
+     */
     public void writeMetaFile(File mOutDir, MetaInfo meta)
         throws AndrolibException {
         try {
@@ -381,6 +396,13 @@ public class Androlib {
         }
     }
 
+    /**
+     * 读取apktool.yml
+     *
+     * @param appDir appDir
+     * @return MetaInfo
+     * @throws AndrolibException 自定义异常
+     */
     public MetaInfo readMetaFile(ExtFile appDir)
         throws AndrolibException {
         try (
@@ -392,14 +414,29 @@ public class Androlib {
         }
     }
 
+    /**
+     * 回编
+     *
+     * @param appDir  appDir
+     * @param outFile outFile
+     * @throws BrutException 自定义异常
+     */
     public void build(File appDir, File outFile) throws BrutException {
         build(new ExtFile(appDir), outFile);
     }
 
+    /**
+     * 回编
+     *
+     * @param appDir  appDir 回编工作根路径
+     * @param outFile outFile 输出文件路径
+     * @throws BrutException 自定义异常
+     */
     public void build(ExtFile appDir, File outFile)
         throws BrutException {
         LOGGER.info("Using Apktool " + Androlib.getVersion());
 
+//        加载apktool.yml
         MetaInfo meta = readMetaFile(appDir);
         apkOptions.isFramework = meta.isFrameworkApk;
         apkOptions.resourcesAreCompressed = meta.compressionType;
@@ -413,6 +450,7 @@ public class Androlib {
         mAndRes.setSparseResources(meta.sparseResources);
 
         if (meta.sdkInfo != null && meta.sdkInfo.get("minSdkVersion") != null) {
+//            赋值minSdkVersion
             String minSdkVersion = meta.sdkInfo.get("minSdkVersion");
             mMinSdkVersion = mAndRes.getMinSdkVersionFromAndroidCodename(meta, minSdkVersion);
         }
@@ -422,10 +460,12 @@ public class Androlib {
             outFile = new File(appDir, "dist" + File.separator + (outFileName == null ? "out.apk" : outFileName));
         }
 
+//        生成回编 build文件夹
         new File(appDir, APK_DIRNAME).mkdirs();
         File manifest = new File(appDir, "AndroidManifest.xml");
         File manifestOriginal = new File(appDir, "AndroidManifest.xml.orig");
 
+//        构建dex文件
         buildSources(appDir);
         buildNonDefaultSources(appDir);
         buildManifestFile(appDir, manifest, manifestOriginal);
@@ -472,6 +512,12 @@ public class Androlib {
         }
     }
 
+    /**
+     * 构建 dex 文件
+     *
+     * @param appDir appDir
+     * @throws AndrolibException 自定义异常
+     */
     public void buildSources(File appDir)
         throws AndrolibException {
         if (!buildSourcesRaw(appDir, "classes.dex") && !buildSourcesSmali(appDir, "smali", "classes.dex")) {
@@ -511,6 +557,15 @@ public class Androlib {
         }
     }
 
+    /**
+     * 拷贝dex文件
+     * 如果filename存在，拷贝filename文件
+     *
+     * @param appDir   appDir
+     * @param filename filename
+     * @return 拷贝结果，不存在false
+     * @throws AndrolibException 自定义异常
+     */
     public boolean buildSourcesRaw(File appDir, String filename)
         throws AndrolibException {
         File working = new File(appDir, filename);
@@ -530,12 +585,22 @@ public class Androlib {
         return true;
     }
 
+    /**
+     * 回编，将smali回编成dex
+     *
+     * @param appDir   appDir 回编根路径
+     * @param folder   folder  文件夹名  如 smali
+     * @param filename filename 生成的dex文件名
+     * @return filename是否存在
+     * @throws AndrolibException 自定义异常
+     */
     public boolean buildSourcesSmali(File appDir, String folder, String filename)
         throws AndrolibException {
         ExtFile smaliDir = new ExtFile(appDir, folder);
         if (!smaliDir.exists()) {
             return false;
         }
+//        生成的dex存放路径
         File dex = new File(appDir, APK_DIRNAME + "/" + filename);
         if (!apkOptions.forceBuildAll) {
             LOGGER.info("Checking whether sources has changed...");
@@ -543,11 +608,19 @@ public class Androlib {
         if (apkOptions.forceBuildAll || isModified(smaliDir, dex)) {
             LOGGER.info("Smaling " + folder + " folder into " + filename + "...");
             dex.delete();
+//            具体的回编操作
             SmaliBuilder.build(smaliDir, dex, apkOptions.forceApi > 0 ? apkOptions.forceApi : mMinSdkVersion);
         }
         return true;
     }
 
+    /**
+     * 回编资源生成 resources.arsc
+     *
+     * @param appDir        appDir
+     * @param usesFramework usesFramework
+     * @throws BrutException 自定义异常
+     */
     public void buildResources(ExtFile appDir, UsesFramework usesFramework)
         throws BrutException {
         if (!buildResourcesRaw(appDir) && !buildResourcesFull(appDir, usesFramework)
@@ -556,6 +629,14 @@ public class Androlib {
         }
     }
 
+    /**
+     * 如果resources.arsc存在
+     * 拷贝 "resources.arsc", "AndroidManifest.xml", "res"
+     *
+     * @param appDir appDir
+     * @return 拷贝结果，不存在false
+     * @throws AndrolibException 自定义异常
+     */
     public boolean buildResourcesRaw(ExtFile appDir)
         throws AndrolibException {
         try {
@@ -577,6 +658,14 @@ public class Androlib {
         }
     }
 
+    /**
+     * 构建 resources.arsc
+     *
+     * @param appDir        appDir
+     * @param usesFramework usesFramework
+     * @return 构建结果，不存在"res" 返回false
+     * @throws AndrolibException 自定义异常
+     */
     public boolean buildResourcesFull(File appDir, UsesFramework usesFramework)
         throws AndrolibException {
         try {
@@ -610,6 +699,7 @@ public class Androlib {
                 if (!ninePatch.exists()) {
                     ninePatch = null;
                 }
+//                使用aapt生成 resources.arsc
                 mAndRes.aaptPackage(apkFile, new File(appDir,
                         "AndroidManifest.xml"), new File(appDir, "res"),
                     ninePatch, null, parseUsesFramework(usesFramework));
@@ -619,6 +709,7 @@ public class Androlib {
                 // Sometimes an application is built with a resources.arsc file with no resources,
                 // Apktool assumes it will have a rebuilt arsc file, when it doesn't. So if we
                 // encounter a copy error, move to a warning and continue on. (#1730)
+//                有时应用程序是用资源构建的。没有资源的Arsc文件， Apktool假设它将有一个重建的arsc文件。当它没有，所以如果我们遇到复制错误，移动到警告并继续。(# 1730)
                 try {
                     tmpDir.copyToDir(apkDir,
                         tmpDir.containsDir("res") ? APK_RESOURCES_FILENAMES
@@ -636,6 +727,15 @@ public class Androlib {
         }
     }
 
+    /**
+     * 从build/apk
+     * 拷贝AndroidManifest.xml
+     * 到appDir
+     *
+     * @param appDir appDir
+     * @return 拷贝结果
+     * @throws AndrolibException 自定义异常
+     */
     public boolean buildManifestRaw(ExtFile appDir)
         throws AndrolibException {
         try {
@@ -648,6 +748,14 @@ public class Androlib {
         }
     }
 
+    /**
+     * 构建AndroidManifest.xml
+     *
+     * @param appDir        appDir
+     * @param usesFramework usesFramework
+     * @return 当appDir 下不存在 AndroidManifest.xml 返回false
+     * @throws BrutException 自定义异常
+     */
     public boolean buildManifest(ExtFile appDir, UsesFramework usesFramework)
         throws BrutException {
         try {
@@ -672,6 +780,7 @@ public class Androlib {
                     ninePatch = null;
                 }
 
+//                使用aapt
                 mAndRes.aaptPackage(apkFile, new File(appDir,
                         "AndroidManifest.xml"), null, ninePatch, null,
                     parseUsesFramework(usesFramework));
@@ -688,12 +797,26 @@ public class Androlib {
         }
     }
 
+    /**
+     * 构建其他libs，标准的apk文件
+     *
+     * @param appDir appDir
+     * @throws AndrolibException 自定义异常
+     */
     public void buildLibs(File appDir) throws AndrolibException {
         buildLibrary(appDir, "lib");
         buildLibrary(appDir, "libs");
         buildLibrary(appDir, "kotlin");
         buildLibrary(appDir, "META-INF/services");
     }
+
+    /**
+     * 拷贝文件folder到  build/apk
+     *
+     * @param appDir appDir
+     * @param folder folder
+     * @throws AndrolibException
+     */
 
     public void buildLibrary(File appDir, String folder) throws AndrolibException {
         File working = new File(appDir, folder);
@@ -714,6 +837,13 @@ public class Androlib {
         }
     }
 
+    /**
+     * 如果copyOriginalFiles 为true
+     * 拷贝original 到build/apk
+     *
+     * @param appDir appDir
+     * @throws AndrolibException 自定义异常
+     */
     public void buildCopyOriginalFiles(File appDir)
         throws AndrolibException {
         if (apkOptions.copyOriginalFiles) {
@@ -737,6 +867,14 @@ public class Androlib {
         }
     }
 
+    /**
+     * 从apktool.yml里面的unknownFiles获取未知（未处理）文件，并拷贝
+     *
+     * @param appDir  appDir
+     * @param outFile outFile
+     * @param meta    meta
+     * @throws AndrolibException 自定义异常
+     */
     public void buildUnknownFiles(File appDir, File outFile, MetaInfo meta)
         throws AndrolibException {
         if (meta.unknownFiles != null) {
@@ -764,6 +902,13 @@ public class Androlib {
         }
     }
 
+    /**
+     * 拷贝存在文件
+     *
+     * @param inputFile  inputFile
+     * @param outputFile outputFile
+     * @throws IOException IO异常
+     */
     private void copyExistingFiles(ZipFile inputFile, ZipOutputStream outputFile) throws IOException {
         // First, copy the contents from the existing outFile:
         Enumeration<? extends ZipEntry> entries = inputFile.entries();
@@ -771,10 +916,12 @@ public class Androlib {
             ZipEntry entry = new ZipEntry(entries.nextElement());
 
             // We can't reuse the compressed size because it depends on compression sizes.
+//            我们不能重用压缩大小，因为它取决于压缩大小。
             entry.setCompressedSize(-1);
             outputFile.putNextEntry(entry);
 
             // No need to create directory entries in the final apk
+//            不需要在最终的apk中创建目录条目
             if (!entry.isDirectory()) {
                 BrutIO.copy(inputFile, outputFile, entry);
             }
@@ -783,6 +930,15 @@ public class Androlib {
         }
     }
 
+    /**
+     * 拷贝未知文件
+     *
+     * @param appDir     appDir
+     * @param outputFile outputFile
+     * @param files      files
+     * @throws BrutException 自定义异常
+     * @throws IOException   IO异常
+     */
     private void copyUnknownFiles(File appDir, ZipOutputStream outputFile, Map<String, String> files)
         throws BrutException, IOException {
         File unknownFileDir = new File(appDir, UNK_DIRNAME);
@@ -806,13 +962,17 @@ public class Androlib {
             int method = Integer.parseInt(unknownFileInfo.getValue());
             LOGGER.fine(String.format("Copying unknown file %s with method %d", unknownFileInfo.getKey(), method));
             if (method == ZipEntry.STORED) {
+//                未压缩
                 newEntry.setMethod(ZipEntry.STORED);
                 newEntry.setSize(inputFile.length());
+//                -1 表示未知
                 newEntry.setCompressedSize(-1);
                 BufferedInputStream unknownFile = new BufferedInputStream(new FileInputStream(inputFile));
+//                CRC32冗余校验
                 CRC32 crc = BrutIO.calculateCrc(unknownFile);
                 newEntry.setCrc(crc.getValue());
             } else {
+//                压缩
                 newEntry.setMethod(ZipEntry.DEFLATED);
             }
             outputFile.putNextEntry(newEntry);
@@ -822,11 +982,19 @@ public class Androlib {
         }
     }
 
+    /**
+     * 构建APK
+     *
+     * @param appDir appDir 根目录
+     * @param outApk outApk dis下的输出文件
+     * @throws AndrolibException 自定义异常
+     */
     public void buildApk(File appDir, File outApk) throws AndrolibException {
         LOGGER.info("Building apk file...");
         if (outApk.exists()) {
             outApk.delete();
         } else {
+//            dis目录
             File outDir = outApk.getParentFile();
             if (outDir != null && !outDir.exists()) {
                 outDir.mkdirs();
@@ -836,26 +1004,55 @@ public class Androlib {
         if (!assetDir.exists()) {
             assetDir = null;
         }
+//        压缩成apk
         mAndRes.zipPackage(outApk, new File(appDir, APK_DIRNAME), assetDir);
     }
 
+    /**
+     * 公开框架资源
+     *
+     * @param arscFile arscFile
+     * @throws AndrolibException 自定义异常
+     */
     public void publicizeResources(File arscFile) throws AndrolibException {
         mAndRes.publicizeResources(arscFile);
     }
 
+    /**
+     * 安装框架
+     *
+     * @param frameFile frameFile
+     * @throws AndrolibException 自定义异常
+     */
     public void installFramework(File frameFile)
         throws AndrolibException {
         mAndRes.installFramework(frameFile);
     }
 
+    /**
+     * 框架list
+     *
+     * @throws AndrolibException 自定义异常
+     */
     public void listFrameworks() throws AndrolibException {
         mAndRes.listFrameworkDirectory();
     }
 
+    /**
+     * 清空框架
+     *
+     * @throws AndrolibException 自定义异常
+     */
     public void emptyFrameworkDirectory() throws AndrolibException {
         mAndRes.emptyFrameworkDirectory();
     }
 
+    /**
+     * 是否是框架apk
+     *
+     * @param resTable ResTable
+     * @return boolean
+     */
     public boolean isFrameworkApk(ResTable resTable) {
         for (ResPackage pkg : resTable.listMainPackages()) {
             if (pkg.getId() < 64) {
@@ -865,10 +1062,22 @@ public class Androlib {
         return false;
     }
 
+    /**
+     * 获取版本
+     *
+     * @return String
+     */
     public static String getVersion() {
         return ApktoolProperties.get("application.version");
     }
 
+    /**
+     * 从使用的框架解析
+     *
+     * @param usesFramework usesFramework
+     * @return File[]
+     * @throws AndrolibException 自定义异常
+     */
     private File[] parseUsesFramework(UsesFramework usesFramework)
         throws AndrolibException {
         if (usesFramework == null) {
@@ -880,6 +1089,7 @@ public class Androlib {
             return null;
         }
 
+//        框架tag
         String tag = usesFramework.tag;
         File[] files = new File[ids.size()];
         int i = 0;
@@ -889,14 +1099,34 @@ public class Androlib {
         return files;
     }
 
+    /**
+     * 是否有修改
+     *
+     * @param working working
+     * @param stored  stored
+     * @return boolean
+     */
     private boolean isModified(File working, File stored) {
         return !stored.exists() || BrutIO.recursiveModifiedTime(working) > BrutIO.recursiveModifiedTime(stored);
     }
 
+    /**
+     * 文件是否存在
+     *
+     * @param working working
+     * @return boolean
+     */
     private boolean isFile(File working) {
         return working.exists();
     }
 
+    /**
+     * 是否有修改
+     *
+     * @param working working
+     * @param stored  stored
+     * @return boolean
+     */
     private boolean isModified(File[] working, File[] stored) {
         for (int i = 0; i < stored.length; i++) {
             if (!stored[i].exists()) {
@@ -906,6 +1136,13 @@ public class Androlib {
         return BrutIO.recursiveModifiedTime(working) > BrutIO.recursiveModifiedTime(stored);
     }
 
+    /**
+     * 批量生成新文件
+     *
+     * @param names names
+     * @param dir   dir
+     * @return File[]
+     */
     private File[] newFiles(String[] names, File dir) {
         File[] files = new File[names.length];
         for (int i = 0; i < names.length; i++) {
@@ -920,20 +1157,49 @@ public class Androlib {
 
     private final static Logger LOGGER = Logger.getLogger(Androlib.class.getName());
 
+    /**
+     * smali文件夹名
+     */
     private final static String SMALI_DIRNAME = "smali";
+    /**
+     * build/apk文件夹名
+     */
     private final static String APK_DIRNAME = "build/apk";
+    /**
+     * unknown文件夹名
+     */
     private final static String UNK_DIRNAME = "unknown";
+    /**
+     * apk资源名
+     */
     private final static String[] APK_RESOURCES_FILENAMES = new String[]{
         "resources.arsc", "AndroidManifest.xml", "res"};
+    /**
+     * 没有res文件名的Apk资源
+     */
     private final static String[] APK_RESOURCES_WITHOUT_RES_FILENAMES = new String[]{
         "resources.arsc", "AndroidManifest.xml"};
+    /**
+     * app资源文件名
+     */
     private final static String[] APP_RESOURCES_FILENAMES = new String[]{
         "AndroidManifest.xml", "res"};
+
+    /**
+     * 清单文件 AndroidManifest.xml
+     */
     private final static String[] APK_MANIFEST_FILENAMES = new String[]{
         "AndroidManifest.xml"};
+    /**
+     * 标准APK的所有文件名
+     */
     private final static String[] APK_STANDARD_ALL_FILENAMES = new String[]{
         "classes.dex", "AndroidManifest.xml", "resources.arsc", "res", "r", "R",
         "lib", "libs", "assets", "META-INF", "kotlin"};
+
+    /**
+     * 不压缩的文件
+     */
     private final static Pattern NO_COMPRESS_PATTERN = Pattern.compile("(" +
         "jpg|jpeg|png|gif|wav|mp2|mp3|ogg|aac|mpg|mpeg|mid|midi|smf|jet|rtttl|imy|xmf|mp4|" +
         "m4a|m4v|3gp|3gpp|3g2|3gpp2|amr|awb|wma|wmv|webm|webp|mkv)$");
