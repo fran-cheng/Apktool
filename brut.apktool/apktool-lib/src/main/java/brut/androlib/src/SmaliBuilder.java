@@ -31,8 +31,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Logger;
 
+/**
+ * Smali构建成dex
+ */
 public class SmaliBuilder {
 
+    /**
+     * 构建
+     *
+     * @param smaliDir smali文件夹
+     * @param dexFile  输出的dex路径
+     * @param apiLevel 编译的api等级
+     * @throws AndrolibException 自定义异常
+     */
     public static void build(ExtFile smaliDir, File dexFile, int apiLevel) throws AndrolibException {
         new SmaliBuilder(smaliDir, dexFile, apiLevel).build();
     }
@@ -43,6 +54,11 @@ public class SmaliBuilder {
         mApiLevel = apiLevel;
     }
 
+    /**
+     * build的具体操作
+     *
+     * @throws AndrolibException 自定义异常
+     */
     private void build() throws AndrolibException {
         try {
             DexBuilder dexBuilder;
@@ -55,14 +71,23 @@ public class SmaliBuilder {
             for (String fileName : mSmaliDir.getDirectory().getFiles(true)) {
                 buildFile(fileName, dexBuilder);
             }
-            dexBuilder.writeTo(new FileDataStore( new File(mDexFile.getAbsolutePath())));
+//            生成最终的dex文件
+            dexBuilder.writeTo(new FileDataStore(new File(mDexFile.getAbsolutePath())));
         } catch (IOException | DirectoryException ex) {
             throw new AndrolibException(ex);
         }
     }
 
+    /**
+     * 往DexBuilder 塞入由smali转换成的内容
+     *
+     * @param fileName   fileName
+     * @param dexBuilder dexBuilder
+     * @throws AndrolibException 自定义异常
+     * @throws IOException       IO异常
+     */
     private void buildFile(String fileName, DexBuilder dexBuilder)
-            throws AndrolibException, IOException {
+        throws AndrolibException, IOException {
         File inFile = new File(mSmaliDir, fileName);
         InputStream inStream = new FileInputStream(inFile);
 
@@ -80,8 +105,17 @@ public class SmaliBuilder {
         inStream.close();
     }
 
+    /**
+     * smali文件夹
+     */
     private final ExtFile mSmaliDir;
+    /**
+     * 输出的dex文件
+     */
     private final File mDexFile;
+    /**
+     * 编译的api等级
+     */
     private final int mApiLevel;
 
     private final static Logger LOGGER = Logger.getLogger(SmaliBuilder.class.getName());

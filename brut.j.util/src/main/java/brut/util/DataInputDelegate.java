@@ -34,6 +34,12 @@ public abstract class DataInputDelegate implements DataInput {
         return mDelegate.readUnsignedShort();
     }
 
+    /**
+     * 读取字节无符号
+     *
+     * @return int
+     * @throws IOException IO异常
+     */
     public int readUnsignedByte() throws IOException {
         return mDelegate.readUnsignedByte();
     }
@@ -54,6 +60,12 @@ public abstract class DataInputDelegate implements DataInput {
         return mDelegate.readLine();
     }
 
+    /**
+     * 读取4个字节
+     *
+     * @return int
+     * @throws IOException IO异常
+     */
     public int readInt() throws IOException {
         return mDelegate.readInt();
     }
@@ -62,6 +74,12 @@ public abstract class DataInputDelegate implements DataInput {
         mDelegate.readFully(b, off, len);
     }
 
+    /**
+     * 全部读取
+     *
+     * @param b byte[]
+     * @throws IOException IO异常
+     */
     public void readFully(byte[] b) throws IOException {
         mDelegate.readFully(b);
     }

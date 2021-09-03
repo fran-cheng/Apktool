@@ -45,13 +45,21 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 /**
- * Android资源文件核心解析
+ * Android资源文件核心处理
  */
 final public class AndrolibResources {
     public ResTable getResTable(ExtFile apkFile) throws AndrolibException {
         return getResTable(apkFile, true);
     }
 
+    /**
+     * 获取ResTable
+     *
+     * @param apkFile     apkFile 待解包
+     * @param loadMainPkg 是否加载Resource.arsc
+     * @return ResTable
+     * @throws AndrolibException 自定义异常
+     */
     public ResTable getResTable(ExtFile apkFile, boolean loadMainPkg)
         throws AndrolibException {
         ResTable resTable = new ResTable(this);
@@ -61,9 +69,18 @@ final public class AndrolibResources {
         return resTable;
     }
 
+    /**
+     * 加载包的主要内容
+     *
+     * @param resTable resTable
+     * @param apkFile  apk路径 待解包
+     * @return
+     * @throws AndrolibException
+     */
     public ResPackage loadMainPkg(ResTable resTable, ExtFile apkFile)
         throws AndrolibException {
         LOGGER.info("Loading resource table...");
+//        package，除了开头到字符串常量池部分
         ResPackage[] pkgs = getResPackagesFromApk(apkFile, resTable, sKeepBroken);
         ResPackage pkg = null;
 
@@ -785,6 +802,15 @@ final public class AndrolibResources {
         }
     }
 
+    /**
+     * 获取resource.arsc 里面的package部分
+     *
+     * @param apkFile    apkFile
+     * @param resTable   resTable
+     * @param keepBroken keepBroken 遇到不能识的，是否跳过
+     * @return ResPackage[]
+     * @throws AndrolibException 自定义异常
+     */
     private ResPackage[] getResPackagesFromApk(ExtFile apkFile, ResTable resTable, boolean keepBroken)
         throws AndrolibException {
         try {

@@ -18,6 +18,7 @@ package brut.androlib.res.data;
 
 import brut.androlib.AndrolibException;
 import brut.androlib.err.UndefinedResObjectException;
+
 import java.util.*;
 
 public final class ResTypeSpec {
@@ -36,6 +37,16 @@ public final class ResTypeSpec {
     private final int mId;
     private final int mEntryCount;
 
+    /**
+     * 读取 ResTable_typeSpec
+     * 类型 anim ,array ,attr之类的
+     *
+     * @param name       根据下标拿到的值 如 anim ,array ,attr
+     * @param resTable   ResTable
+     * @param package_   包名相关
+     * @param id         此块所持有的类型标识符
+     * @param entryCount uint32_t条目配置掩码的数量
+     */
     public ResTypeSpec(String name, ResTable resTable, ResPackage package_, int id, int entryCount) {
         this.mName = name;
         this.mResTable = resTable;

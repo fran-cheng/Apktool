@@ -21,8 +21,12 @@ import brut.androlib.err.UndefinedResObjectException;
 import brut.androlib.meta.VersionInfo;
 import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.value.ResValue;
+
 import java.util.*;
 
+/**
+ * Resources.arsc 文件的文件结构
+ */
 public class ResTable {
     private final AndrolibResources mAndRes;
 

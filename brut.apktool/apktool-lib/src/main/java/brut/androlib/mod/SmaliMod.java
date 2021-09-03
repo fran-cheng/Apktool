@@ -34,6 +34,18 @@ import java.nio.charset.StandardCharsets;
  */
 public class SmaliMod {
 
+    /**
+     * 讲smali文件 整理成dex文件
+     *
+     * @param smaliFile     smaliFile
+     * @param dexBuilder    dexBuilder
+     * @param apiLevel      apiLevel
+     * @param verboseErrors verboseErrors
+     * @param printTokens   printTokens
+     * @return 整理结果
+     * @throws IOException          IO异常
+     * @throws RecognitionException Recognition异常
+     */
     public static boolean assembleSmaliFile(File smaliFile, DexBuilder dexBuilder, int apiLevel, boolean verboseErrors,
                                             boolean printTokens) throws IOException, RecognitionException {
 

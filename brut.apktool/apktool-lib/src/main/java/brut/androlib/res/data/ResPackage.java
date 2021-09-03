@@ -22,20 +22,49 @@ import brut.androlib.res.data.value.ResFileValue;
 import brut.androlib.res.data.value.ResValueFactory;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.util.Duo;
+
 import java.util.*;
 import java.util.logging.Logger;
 
+/**
+ * ResPackage  ， resource.arsc 里面的package
+ */
 public class ResPackage {
+    /**
+     * 整个 resource.arsc 文件
+     */
     private final ResTable mResTable;
+    /**
+     * package的ID ， 一般默认的私有包都为 0x7f
+     */
     private final int mId;
+    /**
+     * 包名
+     */
     private final String mName;
+    /**
+     * 资源ID，ResResSpec
+     */
     private final Map<ResID, ResResSpec> mResSpecs = new LinkedHashMap<ResID, ResResSpec>();
+    /**
+     * 资源配置标记，资源类型
+     */
     private final Map<ResConfigFlags, ResType> mConfigs = new LinkedHashMap<ResConfigFlags, ResType>();
+    /**
+     *
+     */
     private final Map<String, ResTypeSpec> mTypes = new LinkedHashMap<String, ResTypeSpec>();
     private final Set<ResID> mSynthesizedRes = new HashSet<ResID>();
 
     private ResValueFactory mValueFactory;
 
+    /**
+     * ResPackage
+     *
+     * @param resTable ResTable ，resource.arsc
+     * @param id       包ID，  私有==> 0x7F
+     * @param name     包名
+     */
     public ResPackage(ResTable resTable, int id, String name) {
         this.mResTable = resTable;
         this.mId = id;

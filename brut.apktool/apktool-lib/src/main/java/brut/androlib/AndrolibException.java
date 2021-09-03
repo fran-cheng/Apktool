@@ -18,6 +18,9 @@ package brut.androlib;
 
 import brut.common.BrutException;
 
+/**
+ * 自定义的 Androlib 异常
+ */
 public class AndrolibException extends BrutException {
     public AndrolibException() {
     }

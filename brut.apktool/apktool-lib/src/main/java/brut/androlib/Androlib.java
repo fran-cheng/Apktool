@@ -46,9 +46,7 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 /**
- * 核心解析类
- * 主要方法:1.decodeRawFiles 2.decodeManifestWithResources 3.decodeResourcesFull 4.decodeSourcesSmali
- * 基本都能见名思意, 具体实现在AndrolibResources.java
+ * 核心调用类，解包回编都依靠此类进行调用
  */
 public class Androlib {
     /**

@@ -30,35 +30,52 @@ public class StringBlock {
     /**
      * Reads whole (including chunk type) string block from stream. Stream must
      * be at the chunk type.
+     * 从流中读取整个字符串块(包括块类型)。流必须在块类型。
+     *
      * @param reader ExtDataInput
      * @return StringBlock
-     *
      * @throws IOException Parsing resources.arsc error
      */
     public static StringBlock read(ExtDataInput reader) throws IOException {
+//        跳过  头类型+头大小 ，以及可能存在的 0x00000000
         reader.skipCheckChunkTypeInt(CHUNK_STRINGPOOL_TYPE, CHUNK_NULL_TYPE);
+//        该块的总大小(以字节为单位)
         int chunkSize = reader.readInt();
 
         // ResStringPool_header
+//        此池中的字符串数
         int stringCount = reader.readInt();
+//        池中样式span数组的数目
         int styleCount = reader.readInt();
+//        标记
         int flags = reader.readInt();
+//        字符串数据头的索引
         int stringsOffset = reader.readInt();
+//        样式数据头部的索引
         int stylesOffset = reader.readInt();
 
+//        字符串块
         StringBlock block = new StringBlock();
+//        编码模式
         block.m_isUTF8 = (flags & UTF8_FLAG) != 0;
+//        stringOffsets ， 字符串偏移量
         block.m_stringOffsets = reader.readIntArray(stringCount);
 
         if (styleCount != 0) {
+//            样式偏移量
             block.m_styleOffsets = reader.readIntArray(styleCount);
         }
 
+
+//        计算size
         int size = ((stylesOffset == 0) ? chunkSize : stylesOffset) - stringsOffset;
+//        整个ResStringPool
         block.m_strings = new byte[size];
+//        读取ResStringPool的所有数据
         reader.readFully(block.m_strings);
 
         if (stylesOffset != 0) {
+//            样式数据头部的索引 不为 0 ，计算样式大小
             size = (chunkSize - stylesOffset);
             block.m_styles = reader.readIntArray(size / 4);
 
@@ -76,6 +93,7 @@ public class StringBlock {
 
     /**
      * Returns raw string (without any styling information) at specified index.
+     *
      * @param index int
      * @return String
      */
@@ -100,6 +118,7 @@ public class StringBlock {
 
     /**
      * Returns string with style tags (html-like).
+     *
      * @param index int
      * @return String
      */
@@ -254,7 +273,7 @@ public class StringBlock {
      * start index in string * third int is tag end index in string
      */
     private int[] getStyle(int index) {
-        if (m_styleOffsets == null || m_styles == null|| index >= m_styleOffsets.length) {
+        if (m_styleOffsets == null || m_styles == null || index >= m_styleOffsets.length) {
             return null;
         }
         int offset = m_styleOffsets[index] / 4;
@@ -273,7 +292,7 @@ public class StringBlock {
         }
         style = new int[count];
 
-        for (int i = offset, j = 0; i < m_styles.length;) {
+        for (int i = offset, j = 0; i < m_styles.length; ) {
             if (m_styles[i] == -1) {
                 break;
             }
@@ -322,13 +341,13 @@ public class StringBlock {
         val = array[offset];
         offset += 1;
         if ((val & 0x80) != 0) {
-        	int low = (array[offset] & 0xFF);
-        	length = ((val & 0x7F) << 8) + low;
+            int low = (array[offset] & 0xFF);
+            length = ((val & 0x7F) << 8) + low;
             offset += 1;
         } else {
             length = val;
         }
-        return new int[] { offset, length};
+        return new int[]{offset, length};
     }
 
     private static final int[] getUtf16(byte[] array, int offset) {
@@ -337,11 +356,11 @@ public class StringBlock {
         if ((val & 0x8000) != 0) {
             int high = (array[offset + 3] & 0xFF) << 8;
             int low = (array[offset + 2] & 0xFF);
-            int len_value =  ((val & 0x7FFF) << 16) + (high + low);
-            return new int[] {4, len_value * 2};
+            int len_value = ((val & 0x7FFF) << 16) + (high + low);
+            return new int[]{4, len_value * 2};
 
         }
-        return new int[] {2, val * 2};
+        return new int[]{2, val * 2};
     }
 
     private int[] m_stringOffsets;
@@ -356,7 +375,9 @@ public class StringBlock {
     private static final Logger LOGGER = Logger.getLogger(StringBlock.class.getName());
 
     // ResChunk_header = header.type (0x0001) + header.headerSize (0x001C)
+//    头类型+头大小
     private static final int CHUNK_STRINGPOOL_TYPE = 0x001C0001;
+    //    空位
     private static final int CHUNK_NULL_TYPE = 0x00000000;
     private static final int UTF8_FLAG = 0x00000100;
 }

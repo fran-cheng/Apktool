@@ -18,6 +18,9 @@ package brut.androlib;
 
 import java.util.Collection;
 
+/**
+ * 打包选项 ==> 命令行
+ */
 public class ApkOptions {
     public boolean forceBuildAll = false;
     public boolean forceDeleteFramework = false;
