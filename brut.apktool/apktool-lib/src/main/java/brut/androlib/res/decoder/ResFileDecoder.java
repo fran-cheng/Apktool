@@ -31,14 +31,22 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ResFileDecoder {
+    /**
+     * 容器
+     */
     private final ResStreamDecoderContainer mDecoders;
 
+    /**
+     * Res文件解码
+     *
+     * @param decoders ResStreamDecoderContainer
+     */
     public ResFileDecoder(ResStreamDecoderContainer decoders) {
         this.mDecoders = decoders;
     }
 
     public void decode(ResResource res, Directory inDir, Directory outDir)
-            throws AndrolibException {
+        throws AndrolibException {
 
         ResFileValue fileValue = (ResFileValue) res.getValue();
         String inFileName = fileValue.getStrippedPath();
@@ -92,10 +100,10 @@ public class ResFileDecoder {
                         return;
                     } catch (CantFind9PatchChunkException ex) {
                         LOGGER.log(
-                                Level.WARNING,
-                                String.format(
-                                        "Cant find 9patch chunk in file: \"%s\". Renaming it to *.png.",
-                                        inFileName), ex);
+                            Level.WARNING,
+                            String.format(
+                                "Cant find 9patch chunk in file: \"%s\". Renaming it to *.png.",
+                                inFileName), ex);
                         outDir.removeFile(outFileName);
                         outFileName = outResName + ext;
                     }
@@ -123,8 +131,8 @@ public class ResFileDecoder {
             decode(inDir, inFileName, outDir, outFileName, "raw");
         } catch (AndrolibException ex) {
             LOGGER.log(Level.SEVERE, String.format(
-                    "Could not decode file, replacing by FALSE value: %s",
-                    inFileName), ex);
+                "Could not decode file, replacing by FALSE value: %s",
+                inFileName), ex);
             res.replace(new ResBoolValue(false, 0, null));
         }
     }
@@ -132,8 +140,8 @@ public class ResFileDecoder {
     public void decode(Directory inDir, String inFileName, Directory outDir,
                        String outFileName, String decoder) throws AndrolibException {
         try (
-                InputStream in = inDir.getFileInput(inFileName);
-                OutputStream out = outDir.getFileOutput(outFileName)
+            InputStream in = inDir.getFileInput(inFileName);
+            OutputStream out = outDir.getFileOutput(outFileName)
         ) {
             mDecoders.decode(in, out, decoder);
         } catch (DirectoryException | IOException ex) {
@@ -150,11 +158,20 @@ public class ResFileDecoder {
         }
     }
 
+    /**
+     * 解码AndroidManifest.xml
+     *
+     * @param inDir       文件夹
+     * @param inFileName  文件名
+     * @param outDir      文件夹
+     * @param outFileName 文件名
+     * @throws AndrolibException 自定义异常
+     */
     public void decodeManifest(Directory inDir, String inFileName,
                                Directory outDir, String outFileName) throws AndrolibException {
         try (
-                InputStream in = inDir.getFileInput(inFileName);
-                OutputStream out = outDir.getFileOutput(outFileName)
+            InputStream in = inDir.getFileInput(inFileName);
+            OutputStream out = outDir.getFileOutput(outFileName)
         ) {
             ((XmlPullStreamDecoder) mDecoders.getDecoder("xml")).decodeManifest(in, out);
         } catch (DirectoryException | IOException ex) {
@@ -164,12 +181,12 @@ public class ResFileDecoder {
 
     private final static Logger LOGGER = Logger.getLogger(ResFileDecoder.class.getName());
 
-    private final static String[] RAW_IMAGE_EXTENSIONS = new String[] {
+    private final static String[] RAW_IMAGE_EXTENSIONS = new String[]{
         "m4a", // apple
         "qmg", // samsung
     };
 
-    private final static String[] RAW_9PATCH_IMAGE_EXTENSIONS = new String[] {
+    private final static String[] RAW_9PATCH_IMAGE_EXTENSIONS = new String[]{
         "qmg", // samsung
         "spi", // samsung
     };

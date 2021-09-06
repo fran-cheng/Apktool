@@ -17,16 +17,20 @@
 package brut.androlib.res.decoder;
 
 import brut.androlib.AndrolibException;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Res流解码容器
+ */
 public class ResStreamDecoderContainer {
     private final Map<String, ResStreamDecoder> mDecoders = new HashMap<String, ResStreamDecoder>();
 
     public void decode(InputStream in, OutputStream out, String decoderName)
-            throws AndrolibException {
+        throws AndrolibException {
         getDecoder(decoderName).decode(in, out);
     }
 
@@ -38,6 +42,12 @@ public class ResStreamDecoderContainer {
         return decoder;
     }
 
+    /**
+     * 设置解码映射，key为文件类型， value为解码流
+     *
+     * @param name    key
+     * @param decoder value
+     */
     public void setDecoder(String name, ResStreamDecoder decoder) {
         mDecoders.put(name, decoder);
     }

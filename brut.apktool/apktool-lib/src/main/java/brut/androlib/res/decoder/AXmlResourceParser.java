@@ -24,6 +24,7 @@ import brut.androlib.res.xml.ResXmlEncoders;
 import brut.util.ExtDataInput;
 import com.google.common.io.LittleEndianDataInputStream;
 import org.xmlpull.v1.XmlPullParserException;
+
 import java.io.DataInput;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,13 +34,22 @@ import java.util.logging.Logger;
 
 /**
  * Binary xml files parser.
- *
+ * <p>
  * Parser has only two states: (1) Operational state, which parser
  * obtains after first successful call to next() and retains until
  * open(), close(), or failed call to next(). (2) Closed state, which
  * parser obtains after open(), close(), or failed call to next(). In
  * this state methods return invalid values or throw exceptions.
- *
+ * <p>
+ * <p>
+ * 解析器只有两种状态:(1)运行状态，即哪个解析器
+ * 在第一次成功调用next()后获取，并保留到
+ * Open ()， close()，或调用next()失败。(2)闭合状态
+ * 解析器在open()、close()或next()调用失败后获取。在
+ * 这个状态方法返回无效值或抛出异常。
+ * <p>
+ * <p>
+ * 解析AndroidManifest.xml
  * TODO: * check all methods in closed state
  */
 public class AXmlResourceParser implements XmlResourceParser {
@@ -57,10 +67,20 @@ public class AXmlResourceParser implements XmlResourceParser {
         return mFirstError;
     }
 
+    /**
+     * ResAttrDecoder
+     *
+     * @return ResAttrDecoder
+     */
     public ResAttrDecoder getAttrDecoder() {
         return mAttrDecoder;
     }
 
+    /**
+     * 设置ResAttrDecoder
+     *
+     * @param attrDecoder ResAttrDecoder
+     */
     public void setAttrDecoder(ResAttrDecoder attrDecoder) {
         mAttrDecoder = attrDecoder;
     }
@@ -71,6 +91,9 @@ public class AXmlResourceParser implements XmlResourceParser {
             // We need to explicitly cast to DataInput as otherwise the constructor is ambiguous.
             // We choose DataInput instead of InputStream as ExtDataInput wraps an InputStream in
             // a DataInputStream which is big-endian and ignores the little-endian behavior.
+//            需要显式地转换为DataInput，否则构造函数是二义性的。
+//            我们选择DataInput而不是InputStream，因为ExtDataInput封装了一个InputStream
+//            DataInputStream是大端数，忽略小端数的行为。
             m_reader = new ExtDataInput((DataInput) new LittleEndianDataInputStream(stream));
         }
     }
@@ -89,6 +112,14 @@ public class AXmlResourceParser implements XmlResourceParser {
     }
 
     // ///////////////////////////////// iteration
+
+    /**
+     * 迭代
+     *
+     * @return m_event
+     * @throws XmlPullParserException XmlPullParserException
+     * @throws IOException            IOException
+     */
     @Override
     public int next() throws XmlPullParserException, IOException {
         if (m_reader == null) {
@@ -108,6 +139,13 @@ public class AXmlResourceParser implements XmlResourceParser {
         return next();
     }
 
+    /**
+     * 读取标签
+     *
+     * @return int
+     * @throws XmlPullParserException XmlPullParserException
+     * @throws IOException            IOException
+     */
     @Override
     public int nextTag() throws XmlPullParserException, IOException {
         int eventType = next();
@@ -120,6 +158,13 @@ public class AXmlResourceParser implements XmlResourceParser {
         return eventType;
     }
 
+    /**
+     * 读取Text
+     *
+     * @return String
+     * @throws XmlPullParserException XmlPullParserException
+     * @throws IOException            IOException
+     */
     @Override
     public String nextText() throws XmlPullParserException, IOException {
         if (getEventType() != START_TAG) {
@@ -142,9 +187,9 @@ public class AXmlResourceParser implements XmlResourceParser {
 
     @Override
     public void require(int type, String namespace, String name)
-            throws XmlPullParserException, IOException {
+        throws XmlPullParserException, IOException {
         if (type != getEventType() || (namespace != null && !namespace.equals(getNamespace()))
-                || (name != null && !name.equals(getName()))) {
+            || (name != null && !name.equals(getName()))) {
             throw new XmlPullParserException(TYPES[type] + " is expected.", this, null);
         }
     }
@@ -304,7 +349,7 @@ public class AXmlResourceParser implements XmlResourceParser {
     private String getNonDefaultNamespaceUri(int offset) {
         String prefix = m_strings.getString(m_namespaces.getPrefix(offset));
         if (prefix != null) {
-            return  m_strings.getString(m_namespaces.getUri(offset));
+            return m_strings.getString(m_namespaces.getUri(offset));
         }
 
         // If we are here. There is some clever obfuscation going on. Our reference points to the namespace are gone.
@@ -345,7 +390,8 @@ public class AXmlResourceParser implements XmlResourceParser {
                 if (resourceId != 0) {
                     value = mAttrDecoder.decodeManifestAttr(getAttributeNameResource(index));
                 }
-            } catch (AndrolibException | NullPointerException e) { }
+            } catch (AndrolibException | NullPointerException e) {
+            }
         }
         return value;
     }
@@ -382,17 +428,17 @@ public class AXmlResourceParser implements XmlResourceParser {
         if (mAttrDecoder != null) {
             try {
                 return mAttrDecoder.decode(
-                        valueType,
-                        valueData,
-                        valueRaw == -1 ? null : ResXmlEncoders.escapeXmlChars(m_strings.getString(valueRaw)),
-                        getAttributeNameResource(index));
+                    valueType,
+                    valueData,
+                    valueRaw == -1 ? null : ResXmlEncoders.escapeXmlChars(m_strings.getString(valueRaw)),
+                    getAttributeNameResource(index));
             } catch (AndrolibException ex) {
                 setFirstError(ex);
                 LOGGER.log(Level.WARNING, String.format("Could not decode attr value, using undecoded value "
-                                + "instead: ns=%s, name=%s, value=0x%08x",
-                        getAttributePrefix(index),
-                        getAttributeName(index),
-                        valueData), ex);
+                        + "instead: ns=%s, name=%s, value=0x%08x",
+                    getAttributePrefix(index),
+                    getAttributeName(index),
+                    valueData), ex);
             }
         }
         return TypedValue.coerceToString(valueType, valueData);
@@ -548,7 +594,7 @@ public class AXmlResourceParser implements XmlResourceParser {
 
     @Override
     public void defineEntityReplacementText(String entityName, String replacementText)
-            throws XmlPullParserException {
+        throws XmlPullParserException {
         throw new XmlPullParserException(E_NOT_SUPPORTED);
     }
 
@@ -564,7 +610,7 @@ public class AXmlResourceParser implements XmlResourceParser {
 
     @Override
     public void setProperty(String name, Object value)
-            throws XmlPullParserException {
+        throws XmlPullParserException {
         throw new XmlPullParserException(E_NOT_SUPPORTED);
     }
 
@@ -575,11 +621,12 @@ public class AXmlResourceParser implements XmlResourceParser {
 
     @Override
     public void setFeature(String name, boolean value)
-            throws XmlPullParserException {
+        throws XmlPullParserException {
         throw new XmlPullParserException(E_NOT_SUPPORTED);
     }
 
     // /////////////////////////////////////////// implementation
+
     /**
      * Namespace stack, holds prefix+uri pairs, as well as depth information.
      * All information is stored in one int[] array. Array consists of depth
@@ -591,9 +638,8 @@ public class AXmlResourceParser implements XmlResourceParser {
      * methods search all depth frames starting from the last namespace pair of
      * current depth frame. All functions that operate with int, use -1 as
      * 'invalid value'.
-     *
+     * <p>
      * !! functions expect 'prefix'+'uri' pairs, not 'uri'+'prefix' !!
-     *
      */
     private static final class NamespaceStack {
 
@@ -679,6 +725,9 @@ public class AXmlResourceParser implements XmlResourceParser {
             return m_depth;
         }
 
+        /**
+         * 增加深度
+         */
         public final void increaseDepth() {
             ensureDataCapacity(2);
             int offset = m_dataLength;
@@ -688,6 +737,9 @@ public class AXmlResourceParser implements XmlResourceParser {
             m_depth += 1;
         }
 
+        /**
+         * 减少深度
+         */
         public final void decreaseDepth() {
             if (m_dataLength == 0) {
                 return;
@@ -784,13 +836,16 @@ public class AXmlResourceParser implements XmlResourceParser {
         int uri = (namespace != null) ? m_strings.find(namespace) : -1;
         for (int o = 0; o != m_attributes.length; o += ATTRIBUTE_LENGTH) {
             if (name == m_attributes[o + ATTRIBUTE_IX_NAME]
-                    && (uri == -1 || uri == m_attributes[o + ATTRIBUTE_IX_NAMESPACE_URI])) {
+                && (uri == -1 || uri == m_attributes[o + ATTRIBUTE_IX_NAMESPACE_URI])) {
                 return o / ATTRIBUTE_LENGTH;
             }
         }
         return -1;
     }
 
+    /**
+     * 重置event
+     */
     private final void resetEventInfo() {
         m_event = -1;
         m_lineNumber = -1;
@@ -802,25 +857,37 @@ public class AXmlResourceParser implements XmlResourceParser {
         m_styleAttribute = -1;
     }
 
+    /**
+     * 查找下一个
+     *
+     * @throws IOException IO异常
+     */
     private final void doNext() throws IOException {
         // Delayed initialization.
         if (m_strings == null) {
+//            核验文件类型
             m_reader.skipCheckInt(CHUNK_AXML_FILE, CHUNK_AXML_FILE_BROKEN);
 
-			/*
-			 * chunkSize
-			 */
+            /*
+             * chunkSize
+             */
+//            跳过fileSize
             m_reader.skipInt();
+//            读取String块
             m_strings = StringBlock.read(m_reader);
+//             增加nameSpaces深度
             m_namespaces.increaseDepth();
+//            运行状态
             m_operational = true;
         }
 
         if (m_event == END_DOCUMENT) {
+//            假尾部，标签结束
             return;
         }
 
         int event = m_event;
+//        重置
         resetEventInfo();
 
         while (true) {
@@ -831,12 +898,14 @@ public class AXmlResourceParser implements XmlResourceParser {
 
             // Fake END_DOCUMENT event.
             if (event == END_TAG && m_namespaces.getDepth() == 1 && m_namespaces.getCurrentCount() == 0) {
+//                假尾部,标签结束
                 m_event = END_DOCUMENT;
                 break;
             }
 
             int chunkType;
             if (event == START_DOCUMENT) {
+//                假开头，标签开始
                 // Fake event, see CHUNK_XML_START_TAG handler.
                 chunkType = CHUNK_XML_START_TAG;
             } else {
@@ -844,37 +913,51 @@ public class AXmlResourceParser implements XmlResourceParser {
             }
 
             if (chunkType == CHUNK_RESOURCEIDS) {
+//                ResourceIdChunk
                 int chunkSize = m_reader.readInt();
                 if (chunkSize < 8 || (chunkSize % 4) != 0) {
+//                    校验块
                     throw new IOException("Invalid resource ids size (" + chunkSize + ").");
                 }
+//             读取resourceItem
                 m_resourceIDs = m_reader.readIntArray(chunkSize / 4 - 2);
                 continue;
             }
 
             if (chunkType < CHUNK_XML_FIRST || chunkType > CHUNK_XML_LAST) {
+//              校验块
                 throw new IOException("Invalid chunk type (" + chunkType + ").");
             }
 
             // Fake START_DOCUMENT event.
             if (chunkType == CHUNK_XML_START_TAG && event == -1) {
+//                假标签开头
                 m_event = START_DOCUMENT;
                 break;
             }
 
             // Common header.
-			/* chunkSize */m_reader.skipInt();
+            /* chunkSize */
+//            通用的头Size块
+            m_reader.skipInt();
             int lineNumber = m_reader.readInt();
-			/* 0xFFFFFFFF */m_reader.skipInt();
+            /* 0xFFFFFFFF */
+//            UnKnown
+            m_reader.skipInt();
 
             if (chunkType == CHUNK_XML_START_NAMESPACE || chunkType == CHUNK_XML_END_NAMESPACE) {
+//                Start Namespace OR End Namespace
                 if (chunkType == CHUNK_XML_START_NAMESPACE) {
+//                    前缀
                     int prefix = m_reader.readInt();
+//                    uri
                     int uri = m_reader.readInt();
                     m_namespaces.push(prefix, uri);
                 } else {
-					/* prefix */m_reader.skipInt();
-					/* uri */m_reader.skipInt();
+                    /* prefix */
+                    m_reader.skipInt();
+                    /* uri */
+                    m_reader.skipInt();
                     m_namespaces.pop();
                 }
                 continue;
@@ -883,26 +966,38 @@ public class AXmlResourceParser implements XmlResourceParser {
             m_lineNumber = lineNumber;
 
             if (chunkType == CHUNK_XML_START_TAG) {
+//                start Tag Chunk
+//                NamespaceUri
                 m_namespaceUri = m_reader.readInt();
                 m_name = m_reader.readInt();
-				/* flags? */m_reader.skipInt();
+                /* flags? */
+                m_reader.skipInt();
+//                stcAttributeCount
                 int attributeCount = m_reader.readInt();
                 m_idAttribute = (attributeCount >>> 16) - 1;
+
                 attributeCount &= 0xFFFF;
+//             stcClassAttribute
                 m_classAttribute = m_reader.readInt();
                 m_styleAttribute = (m_classAttribute >>> 16) - 1;
                 m_classAttribute = (m_classAttribute & 0xFFFF) - 1;
+//                AttributeChunk
                 m_attributes = m_reader.readIntArray(attributeCount * ATTRIBUTE_LENGTH);
+
                 for (int i = ATTRIBUTE_IX_VALUE_TYPE; i < m_attributes.length; ) {
+//                    只需要value ， 无符号右移动
                     m_attributes[i] = (m_attributes[i] >>> 24);
                     i += ATTRIBUTE_LENGTH;
                 }
+//                深度+1
                 m_namespaces.increaseDepth();
                 m_event = START_TAG;
                 break;
             }
 
             if (chunkType == CHUNK_XML_END_TAG) {
+//                End Tag Chunk
+//                etcNamespaceUri
                 m_namespaceUri = m_reader.readInt();
                 m_name = m_reader.readInt();
                 m_event = END_TAG;
@@ -911,9 +1006,15 @@ public class AXmlResourceParser implements XmlResourceParser {
             }
 
             if (chunkType == CHUNK_XML_TEXT) {
+//                Text Chunk
+//                name
                 m_name = m_reader.readInt();
-				/* ? */m_reader.skipInt();
-				/* ? */m_reader.skipInt();
+                /* ? */
+//                Unknown
+                m_reader.skipInt();
+                /* ? */
+//                Unknown
+                m_reader.skipInt();
                 m_event = TEXT;
                 break;
             }
@@ -927,10 +1028,10 @@ public class AXmlResourceParser implements XmlResourceParser {
     }
 
     // ///////////////////////////////// data
-	/*
-	 * All values are essentially indices, e.g. m_name is an index of name in
-	 * m_strings.
-	 */
+    /*
+     * All values are essentially indices, e.g. m_name is an index of name in
+     * m_strings.
+     */
     private ExtDataInput m_reader;
     private ResAttrDecoder mAttrDecoder;
     private AndrolibException mFirstError;
@@ -953,16 +1054,16 @@ public class AXmlResourceParser implements XmlResourceParser {
     private final static Logger LOGGER = Logger.getLogger(AXmlResourceParser.class.getName());
     private static final String E_NOT_SUPPORTED = "Method is not supported.";
     private static final int ATTRIBUTE_IX_NAMESPACE_URI = 0,
-            ATTRIBUTE_IX_NAME = 1, ATTRIBUTE_IX_VALUE_STRING = 2,
-            ATTRIBUTE_IX_VALUE_TYPE = 3, ATTRIBUTE_IX_VALUE_DATA = 4,
-            ATTRIBUTE_LENGTH = 5;
+        ATTRIBUTE_IX_NAME = 1, ATTRIBUTE_IX_VALUE_STRING = 2,
+        ATTRIBUTE_IX_VALUE_TYPE = 3, ATTRIBUTE_IX_VALUE_DATA = 4,
+        ATTRIBUTE_LENGTH = 5;
 
     private static final int CHUNK_AXML_FILE = 0x00080003, CHUNK_AXML_FILE_BROKEN = 0x00080001,
-            CHUNK_RESOURCEIDS = 0x00080180, CHUNK_XML_FIRST = 0x00100100,
-            CHUNK_XML_START_NAMESPACE = 0x00100100,
-            CHUNK_XML_END_NAMESPACE = 0x00100101,
-            CHUNK_XML_START_TAG = 0x00100102, CHUNK_XML_END_TAG = 0x00100103,
-            CHUNK_XML_TEXT = 0x00100104, CHUNK_XML_LAST = 0x00100104;
+        CHUNK_RESOURCEIDS = 0x00080180, CHUNK_XML_FIRST = 0x00100100,
+        CHUNK_XML_START_NAMESPACE = 0x00100100,
+        CHUNK_XML_END_NAMESPACE = 0x00100101,
+        CHUNK_XML_START_TAG = 0x00100102, CHUNK_XML_END_TAG = 0x00100103,
+        CHUNK_XML_TEXT = 0x00100104, CHUNK_XML_LAST = 0x00100104;
 
     private static final int PRIVATE_PKG_ID = 0x7F;
 }

@@ -40,6 +40,15 @@ import java.util.logging.Logger;
  * 解析resource.arsc 文件
  */
 public class ARSCDecoder {
+    /**
+     * 解码 resource.arsc 用于安装框架或者公共资源
+     *
+     * @param arscStream       resource.arsc 文件输入流
+     * @param findFlagsOffsets 是否找FlagsOffsets ===> true
+     * @param keepBroken       是否保持破碎 ===> true
+     * @return ARSCData
+     * @throws AndrolibException 自定义异常
+     */
     public static ARSCData decode(InputStream arscStream, boolean findFlagsOffsets, boolean keepBroken)
         throws AndrolibException {
         return decode(arscStream, findFlagsOffsets, keepBroken, new ResTable());
@@ -60,6 +69,7 @@ public class ARSCDecoder {
         throws AndrolibException {
         try {
             ARSCDecoder decoder = new ARSCDecoder(arscStream, resTable, findFlagsOffsets, keepBroken);
+//            解码结果
             ResPackage[] pkgs = decoder.readTableHeader();
             return new ARSCData(pkgs, decoder.mFlagsOffsets == null
                 ? null
@@ -206,6 +216,7 @@ public class ARSCDecoder {
             }
         }
 
+//        解析所有ResTable_type完成
         return mPkg;
     }
 
@@ -216,6 +227,7 @@ public class ARSCDecoder {
      * @throws IOException       IO异常
      */
     private void readLibraryType() throws AndrolibException, IOException {
+//        检测位置
         checkChunkType(Header.TYPE_LIBRARY);
         int libraryCount = mIn.readInt();
 
@@ -228,7 +240,9 @@ public class ARSCDecoder {
             LOGGER.info(String.format("Decoding Shared Library (%s), pkgId: %d", packageName, packageId));
         }
 
+
         while (nextChunk().type == Header.TYPE_TYPE) {
+            //        移动到下一块的头，是TYPE_TYPE继续读取
             readTableTypeSpec();
         }
     }
@@ -278,8 +292,10 @@ public class ARSCDecoder {
                 mCountIn.skip(mHeader.endPosition - mCountIn.getCount());
             }
 
+//            移动到下一个块的头部末尾
             type = nextChunk().type;
 
+//            添加未读值， 未知无法读取 为@null引用
             addMissingResSpecs();
         }
     }
@@ -730,7 +746,14 @@ public class ARSCDecoder {
         mResTypeSpecs.put(resTypeSpec.getId(), resTypeSpec);
     }
 
+    /**
+     * 添加未读值， 未知无法读取
+     * 为@null引用
+     *
+     * @throws AndrolibException 自定义异常
+     */
     private void addMissingResSpecs() throws AndrolibException {
+//        后(2进制)16位，（16进制）4位置为0
         int resId = mResId & 0xffff0000;
 
         for (int i = 0; i < mMissingResSpecs.length; i++) {
@@ -738,9 +761,11 @@ public class ARSCDecoder {
                 continue;
             }
 
+//            构建ResResSpec值
             ResResSpec spec = new ResResSpec(new ResID(resId | i), "APKTOOL_DUMMY_" + Integer.toHexString(i), mPkg, mTypeSpec);
 
             // If we already have this resID dont add it again.
+//            如果我们已经有这个残基了，就不要再加了。
             if (!mPkg.hasResSpec(new ResID(resId | i))) {
                 mPkg.addResSpec(spec);
                 mTypeSpec.addResSpec(spec);
@@ -751,6 +776,8 @@ public class ARSCDecoder {
 
                 // We are going to make dummy attributes a null reference (@null) now instead of a boolean false.
                 // This is because aapt2 is much more strict when it comes to what we can put in an application.
+//                现在，我们将使虚拟属性成为一个空引用(@null)，而不是布尔值false。
+//                这是因为aapt2对于我们可以放入应用程序的内容要严格得多。
                 ResValue value = new ResReferenceValue(mPkg, 0, "");
 
                 ResResource res = new ResResource(mType, spec, value);
@@ -882,8 +909,18 @@ public class ARSCDecoder {
     private static final Logger LOGGER = Logger.getLogger(ARSCDecoder.class.getName());
     private static final int KNOWN_CONFIG_BYTES = 56;
 
+    /**
+     * 解码后的ARSCData
+     */
     public static class ARSCData {
 
+        /**
+         * 解码后的ARSCData
+         *
+         * @param packages     解码后的Package资源
+         * @param flagsOffsets 位移
+         * @param resTable     ResTable
+         */
         public ARSCData(ResPackage[] packages, FlagsOffset[] flagsOffsets, ResTable resTable) {
             mPackages = packages;
             mFlagsOffsets = flagsOffsets;
@@ -898,6 +935,12 @@ public class ARSCDecoder {
             return mPackages;
         }
 
+        /**
+         * 获得一个Package
+         *
+         * @return ResPackage
+         * @throws AndrolibException 自定义异常
+         */
         public ResPackage getOnePackage() throws AndrolibException {
             if (mPackages.length <= 0) {
                 throw new AndrolibException("Arsc file contains zero packages");
@@ -911,6 +954,11 @@ public class ARSCDecoder {
             return mPackages[0];
         }
 
+        /**
+         * 找到最多ResSpecs的Package
+         *
+         * @return int 下标
+         */
         public int findPackageWithMostResSpecs() {
             int count = mPackages[0].getResSpecCount();
             int id = 0;

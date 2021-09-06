@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 
+/**
+ * 扩展MXSerializer，ExtXmlSerializer
+ */
 public class ExtMXSerializer extends MXSerializer implements ExtXmlSerializer {
     @Override
     public void startDocument(String encoding, Boolean standalone)

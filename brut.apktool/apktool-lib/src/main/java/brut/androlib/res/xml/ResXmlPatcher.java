@@ -102,7 +102,7 @@ public final class ResXmlPatcher {
      * build, thus preventing the application from installing. This is from a bug/error
      * in AOSP where public resources cannot be part of an authorities attribute within
      * a provider tag.
-     *
+     * <p>
      * This finds any reference and replaces it with the literal value found in the
      * res/values/strings.xml file.
      *
@@ -156,8 +156,8 @@ public final class ResXmlPatcher {
                     saveDocument(file, doc);
                 }
 
-            }  catch (SAXException | ParserConfigurationException | IOException |
-                    XPathExpressionException | TransformerException ignored) {
+            } catch (SAXException | ParserConfigurationException | IOException |
+                XPathExpressionException | TransformerException ignored) {
             }
         }
     }
@@ -165,8 +165,8 @@ public final class ResXmlPatcher {
     /**
      * Checks if the replacement was properly made to a node.
      *
-     * @param file File we are searching for value
-     * @param saved boolean on whether we need to save
+     * @param file     File we are searching for value
+     * @param saved    boolean on whether we need to save
      * @param provider Node we are attempting to replace
      * @return boolean
      */
@@ -185,11 +185,11 @@ public final class ResXmlPatcher {
      * Finds key in strings.xml file and returns text value
      *
      * @param directory Root directory of apk
-     * @param key String reference (ie @string/foo)
+     * @param key       String reference (ie @string/foo)
      * @return String|null
      */
     public static String pullValueFromStrings(File directory, String key) {
-        if (key == null || ! key.contains("@")) {
+        if (key == null || !key.contains("@")) {
             return null;
         }
 
@@ -208,7 +208,7 @@ public final class ResXmlPatcher {
                     return (String) result;
                 }
 
-            }  catch (SAXException | ParserConfigurationException | IOException | XPathExpressionException ignored) {
+            } catch (SAXException | ParserConfigurationException | IOException | XPathExpressionException ignored) {
             }
         }
 
@@ -219,11 +219,11 @@ public final class ResXmlPatcher {
      * Finds key in integers.xml file and returns text value
      *
      * @param directory Root directory of apk
-     * @param key Integer reference (ie @integer/foo)
+     * @param key       Integer reference (ie @integer/foo)
      * @return String|null
      */
     public static String pullValueFromIntegers(File directory, String key) {
-        if (key == null || ! key.contains("@")) {
+        if (key == null || !key.contains("@")) {
             return null;
         }
 
@@ -242,7 +242,7 @@ public final class ResXmlPatcher {
                     return (String) result;
                 }
 
-            }  catch (SAXException | ParserConfigurationException | IOException | XPathExpressionException ignored) {
+            } catch (SAXException | ParserConfigurationException | IOException | XPathExpressionException ignored) {
             }
         }
 
@@ -251,6 +251,7 @@ public final class ResXmlPatcher {
 
     /**
      * Removes attributes like "versionCode" and "versionName" from file.
+     * 从文件中移除“versionCode”和“versionName”等属性。
      *
      * @param file File representing AndroidManifest.xml
      */
@@ -278,8 +279,9 @@ public final class ResXmlPatcher {
 
     /**
      * Replaces package value with passed packageOriginal string
+     * 用传递的packageOriginal字符串替换package的值
      *
-     * @param file File for AndroidManifest.xml
+     * @param file            File for AndroidManifest.xml
      * @param packageOriginal Package name to replace
      */
     public static void renameManifestPackage(File file, String packageOriginal) {
@@ -300,7 +302,6 @@ public final class ResXmlPatcher {
     }
 
     /**
-     *
      * @param file File to load into Document
      * @return Document
      * @throws IOException
@@ -308,7 +309,7 @@ public final class ResXmlPatcher {
      * @throws ParserConfigurationException
      */
     private static Document loadDocument(File file)
-            throws IOException, SAXException, ParserConfigurationException {
+        throws IOException, SAXException, ParserConfigurationException {
 
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         docFactory.setFeature(FEATURE_DISABLE_DOCTYPE_DECL, true);
@@ -326,23 +327,22 @@ public final class ResXmlPatcher {
         // to close it. Somehow parse(File) does not seem to close the file in all cases.
         FileInputStream inputStream = new FileInputStream(file);
         try {
-        	return docBuilder.parse(inputStream);
+            return docBuilder.parse(inputStream);
         } finally {
-        	inputStream.close();
+            inputStream.close();
         }
     }
 
     /**
-     *
      * @param file File to save Document to (ie AndroidManifest.xml)
-     * @param doc Document being saved
+     * @param doc  Document being saved
      * @throws IOException
      * @throws SAXException
      * @throws ParserConfigurationException
      * @throws TransformerException
      */
     private static void saveDocument(File file, Document doc)
-            throws IOException, SAXException, ParserConfigurationException, TransformerException {
+        throws IOException, SAXException, ParserConfigurationException, TransformerException {
 
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         Transformer transformer = transformerFactory.newTransformer();

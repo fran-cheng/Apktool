@@ -27,6 +27,13 @@ public class ExtDataInput extends DataInputDelegate {
         super(delegate);
     }
 
+    /**
+     * 读取int数组
+     *
+     * @param length 长度
+     * @return int[]
+     * @throws IOException IO异常
+     */
     public int[] readIntArray(int length) throws IOException {
         int[] array = new int[length];
         for (int i = 0; i < length; i++) {
@@ -39,6 +46,13 @@ public class ExtDataInput extends DataInputDelegate {
         skipBytes(4);
     }
 
+    /**
+     * 跳过核验
+     *
+     * @param expected1 expected1
+     * @param expected2 expected2
+     * @throws IOException IO异常
+     */
     public void skipCheckInt(int expected1, int expected2) throws IOException {
         int got = readInt();
         if (got != expected1 && got != expected2) {

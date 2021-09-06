@@ -70,12 +70,12 @@ final public class AndrolibResources {
     }
 
     /**
-     * 加载包的主要内容
+     * 加载主要包内容  到  ResTable
      *
      * @param resTable resTable
      * @param apkFile  apk路径 待解包
-     * @return
-     * @throws AndrolibException
+     * @return ResPackage
+     * @throws AndrolibException 自定义异常
      */
     public ResPackage loadMainPkg(ResTable resTable, ExtFile apkFile)
         throws AndrolibException {
@@ -86,20 +86,24 @@ final public class AndrolibResources {
 
         switch (pkgs.length) {
             case 1:
+//                获取唯一的package
                 pkg = pkgs[0];
                 break;
             case 2:
                 if (pkgs[0].getName().equals("android")) {
+//                    跳过android package
                     LOGGER.warning("Skipping \"android\" package group");
                     pkg = pkgs[1];
                     break;
                 } else if (pkgs[0].getName().equals("com.htc")) {
+//                    跳过htc package
                     LOGGER.warning("Skipping \"htc\" package group");
                     pkg = pkgs[1];
                     break;
                 }
 
             default:
+//                超过2个以上 选择ResSpecs最多的那个package
                 pkg = selectPkgWithMostResSpecs(pkgs);
                 break;
         }
@@ -112,11 +116,16 @@ final public class AndrolibResources {
         return pkg;
     }
 
+    /**
+     * 选择最多 ResSpecs 的Package
+     *
+     * @param pkgs ResPackage[]
+     * @return ResPackage
+     */
     public ResPackage selectPkgWithMostResSpecs(ResPackage[] pkgs) {
         int id = 0;
         int value = 0;
         int index = 0;
-
         for (int i = 0; i < pkgs.length; i++) {
             ResPackage resPackage = pkgs[i];
             if (resPackage.getResSpecCount() > value && !resPackage.getName().equalsIgnoreCase("android")) {
@@ -155,6 +164,14 @@ final public class AndrolibResources {
         return pkg;
     }
 
+    /**
+     * 解码AndroidManifest.xml 不使用Resource.arsc
+     *
+     * @param resTable ResTable
+     * @param apkFile  ExtFile
+     * @param outDir   File
+     * @throws AndrolibException 自定义异常
+     */
     public void decodeManifest(ResTable resTable, ExtFile apkFile, File outDir)
         throws AndrolibException {
 
@@ -172,7 +189,7 @@ final public class AndrolibResources {
         try {
             inApk = apkFile.getDirectory();
             out = new FileDirectory(outDir);
-
+//            仅使用框架资源来解码
             LOGGER.info("Decoding AndroidManifest.xml with only framework resources...");
             fileDecoder.decodeManifest(inApk, "AndroidManifest.xml", out, "AndroidManifest.xml");
 
@@ -181,10 +198,18 @@ final public class AndrolibResources {
         }
     }
 
+    /**
+     * 调整AndroidManifest
+     *
+     * @param resTable ResTable
+     * @param filePath filePath
+     * @throws AndrolibException
+     */
     public void adjustPackageManifest(ResTable resTable, String filePath)
         throws AndrolibException {
 
         // compare resources.arsc package name to the one present in AndroidManifest
+//        比较resources.arsc 和 现在的AndroidManifest中的包名
         ResPackage resPackage = resTable.getCurrentResPackage();
         String pkgOriginal = resPackage.getName();
         mPackageRenamed = resTable.getPackageRenamed();
@@ -198,17 +223,29 @@ final public class AndrolibResources {
             LOGGER.info("Regular manifest package...");
         } else {
             LOGGER.info("Renamed manifest package found! Replacing " + mPackageRenamed + " with " + pkgOriginal);
+//            重命名包名为pkgOriginal
             ResXmlPatcher.renameManifestPackage(new File(filePath), pkgOriginal);
         }
     }
 
+    /**
+     * 根据 resources.arsc 解码AndroidManifest.xml
+     *
+     * @param apkFile  apkFile
+     * @param outDir   outDir
+     * @param resTable resTable 解析的 resources.arsc
+     * @throws AndrolibException 自定义异常
+     */
     public void decodeManifestWithResources(ResTable resTable, ExtFile apkFile, File outDir)
         throws AndrolibException {
 
         Duo<ResFileDecoder, AXmlResourceParser> duo = getManifestFileDecoder(true);
+//        Res文件解码
         ResFileDecoder fileDecoder = duo.m1;
+//        Res属性解码
         ResAttrDecoder attrDecoder = duo.m2.getAttrDecoder();
 
+//        设置属性解码的Package，为mainPackage
         attrDecoder.setCurrentPackage(resTable.listMainPackages().iterator().next());
 
         Directory inApk, in = null, out;
@@ -217,20 +254,29 @@ final public class AndrolibResources {
             out = new FileDirectory(outDir);
             LOGGER.info("Decoding AndroidManifest.xml with resources...");
 
+//            开始解码APK里面的AroidManifest.xml
             fileDecoder.decodeManifest(inApk, "AndroidManifest.xml", out, "AndroidManifest.xml");
 
             // Remove versionName / versionCode (aapt API 16)
             if (!resTable.getAnalysisMode()) {
 
+//                非分析模式
                 // check for a mismatch between resources.arsc package and the package listed in AndroidManifest
                 // also remove the android::versionCode / versionName from manifest for rebuild
                 // this is a required change to prevent aapt warning about conflicting versions
                 // it will be passed as a parameter to aapt like "--min-sdk-version" via apktool.yml
+//                检查资源之间是否不匹配。arsc包和AndroidManifest中列出的包
+//                同时从manifest中移除android::versionCode / versionName用于重建
+//                这是一个必需的更改，以防止aapt警告关于冲突的版本
+//                它将通过apktool.yml作为参数传递给aapt，如“——min-sdk-version”
+//                调整AndroidManifest文件
                 adjustPackageManifest(resTable, outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml");
 
+//                从文件中移除“versionCode”和“versionName”等属性。
                 ResXmlPatcher.removeManifestVersions(new File(
                     outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml"));
 
+//                持有packageId
                 mPackageId = String.valueOf(resTable.getPackageId());
             }
         } catch (DirectoryException ex) {
@@ -238,12 +284,21 @@ final public class AndrolibResources {
         }
     }
 
+    /**
+     * 解码的操作
+     *
+     * @param resTable ResTable
+     * @param apkFile  ExtFile
+     * @param outDir   File
+     * @throws AndrolibException 自定义异常
+     */
     public void decode(ResTable resTable, ExtFile apkFile, File outDir)
         throws AndrolibException {
         Duo<ResFileDecoder, AXmlResourceParser> duo = getResFileDecoder();
         ResFileDecoder fileDecoder = duo.m1;
         ResAttrDecoder attrDecoder = duo.m2.getAttrDecoder();
 
+//        设置属性解码的Package，为mainPackage
         attrDecoder.setCurrentPackage(resTable.listMainPackages().iterator().next());
         Directory inApk, in = null, out;
 
@@ -251,6 +306,8 @@ final public class AndrolibResources {
             out = new FileDirectory(outDir);
 
             inApk = apkFile.getDirectory();
+//            创建Res文件夹
+            // TODO: 2021/9/6  
             out = out.createDir("res");
             if (inApk.containsDir("res")) {
                 in = inApk.getDir("res");
@@ -731,23 +788,42 @@ final public class AndrolibResources {
         return new Duo<ResFileDecoder, AXmlResourceParser>(new ResFileDecoder(decoders), axmlParser);
     }
 
+    /**
+     * 解码ManifestFile
+     *
+     * @param withResources boolean
+     * @return Duo<ResFileDecoder, AXmlResourceParser>.
+     */
     public Duo<ResFileDecoder, AXmlResourceParser> getManifestFileDecoder(boolean withResources) {
+//        解码容器
         ResStreamDecoderContainer decoders = new ResStreamDecoderContainer();
 
+//        解析Xml
         AXmlResourceParser axmlParser = new AndroidManifestResourceParser();
         if (withResources) {
+//            设置属性解码
             axmlParser.setAttrDecoder(new ResAttrDecoder());
         }
+//        解码容器设置解码类型用到的流
         decoders.setDecoder("xml", new XmlPullStreamDecoder(axmlParser, getResXmlSerializer()));
 
         return new Duo<ResFileDecoder, AXmlResourceParser>(new ResFileDecoder(decoders), axmlParser);
     }
 
+    /**
+     * 获取ResXmlSerializer
+     *
+     * @return ExtMXSerializer
+     */
     public ExtMXSerializer getResXmlSerializer() {
         ExtMXSerializer serial = new ExtMXSerializer();
+//      设置缩进
         serial.setProperty(ExtXmlSerializer.PROPERTY_SERIALIZER_INDENTATION, "    ");
+//      属性序列化行分隔符
         serial.setProperty(ExtXmlSerializer.PROPERTY_SERIALIZER_LINE_SEPARATOR, System.getProperty("line.separator"));
+//      编码格式
         serial.setProperty(ExtXmlSerializer.PROPERTY_DEFAULT_ENCODING, "utf-8");
+//      DisabledAttrEscape
         serial.setDisabledAttrEscape(true);
         return serial;
     }

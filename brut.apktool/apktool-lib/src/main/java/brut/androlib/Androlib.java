@@ -174,7 +174,7 @@ public class Androlib {
     }
 
     /**
-     * 解码AndroidManifest.xml
+     * 解码AndroidManifest.xml，直接解码，不使用arsc
      *
      * @param apkFile  apkFile
      * @param outDir   outDir
@@ -221,7 +221,7 @@ public class Androlib {
      *
      * @param apkFile  apkFile
      * @param outDir   outDir
-     * @param resTable resTable
+     * @param resTable resTable 解析的 resources.arsc
      * @throws AndrolibException 自定义异常
      */
     public void decodeManifestWithResources(ExtFile apkFile, File outDir, ResTable resTable)

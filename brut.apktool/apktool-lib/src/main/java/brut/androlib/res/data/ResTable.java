@@ -25,14 +25,21 @@ import brut.androlib.res.data.value.ResValue;
 import java.util.*;
 
 /**
- * Resources.arsc 文件的文件结构
+ * 已经解析了的 Resources.arsc 文件的文件结构
+ *
  */
 public class ResTable {
     private final AndrolibResources mAndRes;
 
     private final Map<Integer, ResPackage> mPackagesById = new HashMap<Integer, ResPackage>();
     private final Map<String, ResPackage> mPackagesByName = new HashMap<String, ResPackage>();
+    /**
+     * 主要的package，解包后私有的
+     */
     private final Set<ResPackage> mMainPackages = new LinkedHashSet<ResPackage>();
+    /**
+     * 框架packages， Android之类的安装的框架文件
+     */
     private final Set<ResPackage> mFramePackages = new LinkedHashSet<ResPackage>();
 
     private String mPackageRenamed;
@@ -125,6 +132,13 @@ public class ResTable {
         return getPackage(package_).getType(type).getResSpec(name).getDefaultResource().getValue();
     }
 
+    /**
+     * 添加Package
+     *
+     * @param pkg  ResPackage
+     * @param main boolean
+     * @throws AndrolibException 自定义异常
+     */
     public void addPackage(ResPackage pkg, boolean main) throws AndrolibException {
         Integer id = pkg.getId();
         if (mPackagesById.containsKey(id)) {
@@ -172,6 +186,11 @@ public class ResTable {
         mSdkInfo.clear();
     }
 
+    /**
+     * 添加SDK信息
+     * @param key key
+     * @param value value
+     */
     public void addSdkInfo(String key, String value) {
         mSdkInfo.put(key, value);
     }

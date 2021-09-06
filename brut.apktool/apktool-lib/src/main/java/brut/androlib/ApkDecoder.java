@@ -367,6 +367,7 @@ public class ApkDecoder {
                 throw new AndrolibException(
                     "Apk doesn't contain either AndroidManifest.xml file or resources.arsc file");
             }
+//            解析Arsc文件
             mResTable = mAndrolib.getResTable(mApkFile, hasResources);
             mResTable.setAnalysisMode(mAnalysisMode);
         }
