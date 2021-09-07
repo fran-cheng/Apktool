@@ -19,9 +19,21 @@ package brut.androlib.res.data;
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.value.ResValue;
 
+/**
+ * Res资源
+ */
 public class ResResource {
+    /**
+     * 资源类型
+     */
     private final ResType mConfig;
+    /**
+     * 资源规格
+     */
     private final ResResSpec mResSpec;
+    /**
+     * 资源值
+     */
     private final ResValue mValue;
 
     public ResResource(ResType config, ResResSpec spec, ResValue value) {
@@ -30,18 +42,39 @@ public class ResResource {
         this.mValue = value;
     }
 
+    /**
+     * 获得资源文件路径
+     * 如drawable + -hdpi + / + icon.png
+     *
+     * @return path
+     */
     public String getFilePath() {
         return mResSpec.getType().getName() + mConfig.getFlags().getQualifiers() + "/" + mResSpec.getName();
     }
 
+    /**
+     * 资源类型
+     *
+     * @return ResType
+     */
     public ResType getConfig() {
         return mConfig;
     }
 
+    /**
+     * 资源规格
+     *
+     * @return ResResSpec
+     */
     public ResResSpec getResSpec() {
         return mResSpec;
     }
 
+    /**
+     * 资源的值
+     *
+     * @return ResValue
+     */
     public ResValue getValue() {
         return mValue;
     }

@@ -18,8 +18,11 @@ package brut.androlib.err;
 
 import brut.androlib.AndrolibException;
 
+/**
+ * 未定义的Res异常
+ */
 public class UndefinedResObjectException extends AndrolibException {
-	public UndefinedResObjectException(String message) {
-		super(message);
-	}
+    public UndefinedResObjectException(String message) {
+        super(message);
+    }
 }

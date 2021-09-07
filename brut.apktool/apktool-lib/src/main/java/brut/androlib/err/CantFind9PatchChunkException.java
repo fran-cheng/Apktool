@@ -18,8 +18,11 @@ package brut.androlib.err;
 
 import brut.androlib.AndrolibException;
 
+/**
+ * 不能找到.9图块异常
+ */
 public class CantFind9PatchChunkException extends AndrolibException {
-	public CantFind9PatchChunkException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public CantFind9PatchChunkException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

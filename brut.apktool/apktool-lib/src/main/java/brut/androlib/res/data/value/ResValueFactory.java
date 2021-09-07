@@ -22,7 +22,13 @@ import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResTypeSpec;
 import brut.util.Duo;
 
+/**
+ * ResValue工厂
+ */
 public class ResValueFactory {
+    /**
+     * Resource.arsc 下的package
+     */
     private final ResPackage mPackage;
 
     public ResValueFactory(ResPackage package_) {
@@ -95,12 +101,12 @@ public class ResValueFactory {
 
         // Android O Preview added an unknown enum for c. This is hardcoded as 0 for now.
         if (ResTypeSpec.RES_TYPE_NAME_ARRAY.equals(resTypeName)
-                || key == ResArrayValue.BAG_KEY_ARRAY_START || key == 0) {
+            || key == ResArrayValue.BAG_KEY_ARRAY_START || key == 0) {
             return new ResArrayValue(parentVal, items);
         }
 
         if (ResTypeSpec.RES_TYPE_NAME_PLURALS.equals(resTypeName) ||
-                (key >= ResPluralsValue.BAG_KEY_PLURALS_START && key <= ResPluralsValue.BAG_KEY_PLURALS_END)) {
+            (key >= ResPluralsValue.BAG_KEY_PLURALS_START && key <= ResPluralsValue.BAG_KEY_PLURALS_END)) {
             return new ResPluralsValue(parentVal, items);
         }
 

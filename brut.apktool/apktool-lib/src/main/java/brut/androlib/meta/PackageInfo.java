@@ -16,7 +16,16 @@
  */
 package brut.androlib.meta;
 
+/**
+ * 包相关信息
+ */
 public class PackageInfo {
+    /**
+     * 包ID ，一般都是127 0x7F
+     */
     public String forcedPackageId;
+    /**
+     * 回编后的包名
+     */
     public String renameManifestPackage;
 }

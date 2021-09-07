@@ -29,6 +29,13 @@ import java.util.Map;
 public class ResStreamDecoderContainer {
     private final Map<String, ResStreamDecoder> mDecoders = new HashMap<String, ResStreamDecoder>();
 
+    /**
+     * 解码
+     * @param in 输入流
+     * @param out 输出流
+     * @param decoderName 解码的类型
+     * @throws AndrolibException 自定义
+     */
     public void decode(InputStream in, OutputStream out, String decoderName)
         throws AndrolibException {
         getDecoder(decoderName).decode(in, out);

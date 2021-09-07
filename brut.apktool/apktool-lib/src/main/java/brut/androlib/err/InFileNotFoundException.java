@@ -18,7 +18,10 @@ package brut.androlib.err;
 
 import brut.androlib.AndrolibException;
 
+/**
+ * 输入文件找不到异常
+ */
 public class InFileNotFoundException extends AndrolibException {
-	public InFileNotFoundException() {
-	}
+    public InFileNotFoundException() {
+    }
 }

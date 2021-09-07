@@ -16,7 +16,16 @@
  */
 package brut.androlib.meta;
 
+/**
+ * 版本信息
+ */
 public class VersionInfo {
+    /**
+     * 版本code
+     */
     public String versionCode;
+    /**
+     * 版本名字
+     */
     public String versionName;
 }

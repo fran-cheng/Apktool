@@ -18,10 +18,20 @@ package brut.androlib.res.data;
 
 import brut.androlib.AndrolibException;
 import brut.androlib.err.UndefinedResObjectException;
+
 import java.util.*;
 
+/**
+ * Res文件类型
+ */
 public class ResType {
+    /**
+     * Res配置标记
+     */
     private final ResConfigFlags mFlags;
+    /**
+     * Res规格与ResResource的映射
+     */
     private final Map<ResResSpec, ResResource> mResources = new LinkedHashMap<ResResSpec, ResResource>();
 
     public ResType(ResConfigFlags flags) {
@@ -40,9 +50,23 @@ public class ResType {
         return mFlags;
     }
 
+    /**
+     * 添加Res文件
+     *
+     * @param res ResResource
+     * @throws AndrolibException
+     */
     public void addResource(ResResource res) throws AndrolibException {
         addResource(res, false);
     }
+
+    /**
+     * 添加ResResource
+     *
+     * @param res       ResResource
+     * @param overwrite 是否重写
+     * @throws AndrolibException 自定义异常
+     */
 
     public void addResource(ResResource res, boolean overwrite) throws AndrolibException {
         ResResSpec spec = res.getResSpec();

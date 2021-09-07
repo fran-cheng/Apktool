@@ -19,6 +19,9 @@ package brut.androlib.meta;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.representer.Representer;
 
+/**
+ * Yml的Representer
+ */
 public class StringExRepresent extends Representer {
     public StringExRepresent() {
         RepresentStringEx representStringEx = new RepresentStringEx();

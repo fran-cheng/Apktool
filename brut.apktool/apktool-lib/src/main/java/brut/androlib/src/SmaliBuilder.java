@@ -37,7 +37,7 @@ import java.util.logging.Logger;
 public class SmaliBuilder {
 
     /**
-     * 构建
+     * 构建classes.dex
      *
      * @param smaliDir smali文件夹
      * @param dexFile  输出的dex路径
@@ -61,6 +61,7 @@ public class SmaliBuilder {
      */
     private void build() throws AndrolibException {
         try {
+//            Dex构建
             DexBuilder dexBuilder;
             if (mApiLevel > 0) {
                 dexBuilder = new DexBuilder(Opcodes.forApi(mApiLevel));
@@ -69,6 +70,7 @@ public class SmaliBuilder {
             }
 
             for (String fileName : mSmaliDir.getDirectory().getFiles(true)) {
+//                遍历smali文件构建dex
                 buildFile(fileName, dexBuilder);
             }
 //            生成最终的dex文件

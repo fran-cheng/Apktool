@@ -22,6 +22,9 @@ import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 import org.yaml.snakeyaml.nodes.Tag;
 
+/**
+ * Yml的Constructor
+ */
 public class StringExConstructor extends Constructor {
     public StringExConstructor() {
         this.yamlConstructors.put(Tag.STR, new ConstructStringEx());

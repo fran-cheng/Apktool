@@ -21,6 +21,9 @@ import brut.androlib.err.UndefinedResObjectException;
 
 import java.util.*;
 
+/**
+ * 资源类型规格
+ */
 public final class ResTypeSpec {
 
     public static final String RES_TYPE_NAME_ARRAY = "array";
@@ -28,12 +31,21 @@ public final class ResTypeSpec {
     public static final String RES_TYPE_NAME_STYLES = "style";
     public static final String RES_TYPE_NAME_ATTR = "attr";
 
+    /**
+     * 类型名字
+     */
     private final String mName;
+
+    /**
+     * 资源类型 与 资源ID的ResResSpec映射
+     */
     private final Map<String, ResResSpec> mResSpecs = new LinkedHashMap<String, ResResSpec>();
 
     private final ResTable mResTable;
     private final ResPackage mPackage;
-
+    /**
+     * 此块所持有的类型标识符
+     */
     private final int mId;
     private final int mEntryCount;
 
@@ -55,18 +67,40 @@ public final class ResTypeSpec {
         this.mEntryCount = entryCount;
     }
 
+    /**
+     * 获得type名
+     *
+     * @return String
+     */
     public String getName() {
         return mName;
     }
 
+    /**
+     * 此块所持有的类型标识符
+     * 类型ID值
+     *
+     * @return int
+     */
     public int getId() {
         return mId;
     }
 
+    /**
+     * 类型名是否是string
+     *
+     * @return boolean
+     */
     public boolean isString() {
         return mName.equalsIgnoreCase("string");
     }
 
+    /**
+     * 获取ResResSpec
+     *
+     * @param name 资源名字
+     * @return ResResSpec
+     */
     public ResResSpec getResSpec(String name) throws AndrolibException {
         ResResSpec spec = getResSpecUnsafe(name);
         if (spec == null) {
@@ -75,16 +109,33 @@ public final class ResTypeSpec {
         return spec;
     }
 
+    /**
+     * 获取ResResSpec
+     *
+     * @param name 资源名字
+     * @return ResResSpec
+     */
     public ResResSpec getResSpecUnsafe(String name) {
         return mResSpecs.get(name);
     }
 
+    /**
+     * 移除ResSpec 通过 ResResSpec
+     *
+     * @param spec ResResSpec
+     */
     public void removeResSpec(ResResSpec spec) {
         mResSpecs.remove(spec.getName());
     }
 
+    /**
+     * 添加ResSpec 通过 ResResSpec
+     *
+     * @param spec ResResSpec
+     */
     public void addResSpec(ResResSpec spec) throws AndrolibException {
         if (mResSpecs.put(spec.getName(), spec) != null) {
+//            已存在则报异常
             throw new AndrolibException(String.format("Multiple res specs: %s/%s", getName(), spec.getName()));
         }
     }

@@ -18,6 +18,9 @@ package brut.androlib.meta;
 
 import java.util.List;
 
+/**
+ * 使用的框架
+ */
 public class UsesFramework {
     public List<Integer> ids;
     public String tag;

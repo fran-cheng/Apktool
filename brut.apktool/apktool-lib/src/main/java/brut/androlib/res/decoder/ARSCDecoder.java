@@ -79,6 +79,14 @@ public class ARSCDecoder {
         }
     }
 
+    /**
+     * 构造方法
+     *
+     * @param arscStream        resource.arsc 文件输入流
+     * @param resTable          ResTable
+     * @param storeFlagsOffsets 是否找FlagsOffsets
+     * @param keepBroken        是否保持破碎
+     */
     private ARSCDecoder(InputStream arscStream, ResTable resTable, boolean storeFlagsOffsets, boolean keepBroken) {
         arscStream = mCountIn = new CountingInputStream(arscStream);
         if (storeFlagsOffsets) {
@@ -89,6 +97,9 @@ public class ARSCDecoder {
         // We need to explicitly cast to DataInput as otherwise the constructor is ambiguous.
         // We choose DataInput instead of InputStream as ExtDataInput wraps an InputStream in
         // a DataInputStream which is big-endian and ignores the little-endian behavior.
+//        需要显式地转换为DataInput，否则构造函数是二义性的。
+//        我们选择DataInput而不是InputStream，因为ExtDataInput封装了一个InputStream
+//        DataInputStream是大端的，忽略小端行为。
         mIn = new ExtDataInput((DataInput) new LittleEndianDataInputStream(arscStream));
         mResTable = resTable;
         mKeepBroken = keepBroken;
@@ -832,8 +843,14 @@ public class ARSCDecoder {
         checkChunkType(expectedType);
     }
 
+    /**
+     * 待解码的数据流
+     */
     private final ExtDataInput mIn;
     private final ResTable mResTable;
+    /**
+     * 它计算到目前为止已经通过流的字节数
+     */
     private final CountingInputStream mCountIn;
     private final List<FlagsOffset> mFlagsOffsets;
     private final boolean mKeepBroken;
@@ -844,6 +861,9 @@ public class ARSCDecoder {
      * TablePackageType下的StringPoolType下的ResStringPooL_string 数组
      */
     private StringBlock mTypeNames;
+    /**
+     * package下的ResStringPool_keyStrings
+     */
     private StringBlock mSpecNames;
     /**
      * Res包名， 私有为0x7f

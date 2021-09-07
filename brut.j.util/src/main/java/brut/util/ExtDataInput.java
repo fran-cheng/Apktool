@@ -18,11 +18,24 @@ package brut.util;
 
 import java.io.*;
 
+/**
+ * 提取DataInput
+ */
 public class ExtDataInput extends DataInputDelegate {
+    /**
+     * 将InputStream 转为 DataInputStream
+     *
+     * @param in InputStream
+     */
     public ExtDataInput(InputStream in) {
         this((DataInput) new DataInputStream(in));
     }
 
+    /**
+     * DataInput
+     *
+     * @param delegate DataInput
+     */
     public ExtDataInput(DataInput delegate) {
         super(delegate);
     }
@@ -42,15 +55,20 @@ public class ExtDataInput extends DataInputDelegate {
         return array;
     }
 
+    /**
+     * 跳过4个字节
+     *
+     * @throws IOException IO异常
+     */
     public void skipInt() throws IOException {
         skipBytes(4);
     }
 
     /**
-     * 跳过核验
+     * 跳过4个字节，并核验
      *
-     * @param expected1 expected1
-     * @param expected2 expected2
+     * @param expected1 expected1 期望的值1
+     * @param expected2 expected2 期望的值2
      * @throws IOException IO异常
      */
     public void skipCheckInt(int expected1, int expected2) throws IOException {
@@ -61,6 +79,12 @@ public class ExtDataInput extends DataInputDelegate {
         }
     }
 
+    /**
+     * 跳过short，并核验
+     *
+     * @param expected expected 期望的值
+     * @throws IOException IO异常
+     */
     public void skipCheckShort(short expected) throws IOException {
         short got = readShort();
         if (got != expected) {
@@ -69,6 +93,12 @@ public class ExtDataInput extends DataInputDelegate {
         }
     }
 
+    /**
+     * 跳过byte，并核验
+     *
+     * @param expected expected 期望的值
+     * @throws IOException IO异常
+     */
     public void skipCheckByte(byte expected) throws IOException {
         byte got = readByte();
         if (got != expected) {
@@ -100,6 +130,12 @@ public class ExtDataInput extends DataInputDelegate {
      * The general contract of DataInput doesn't guarantee all the bytes requested will be skipped
      * and failure can occur for many reasons. We override this to try harder to skip all the bytes
      * requested (this is similar to DataInputStream's wrapper).
+     * <p>
+     * DataInput的一般契约并不保证跳过所有请求的字节
+     * 失败的原因有很多。我们重写它以更努力地跳过所有字节
+     * 请求(这类似于DataInputStream的包装器)。
+     * <p>
+     * 尽力跳过期望的N个字节
      */
     public final int skipBytes(int n) throws IOException {
         int total = 0;
@@ -112,6 +148,14 @@ public class ExtDataInput extends DataInputDelegate {
         return total;
     }
 
+    /**
+     * 读取String
+     *
+     * @param length 读取长度
+     * @param fixed  是否跳过length * 2
+     * @return String
+     * @throws IOException IO异常
+     */
     public String readNullEndedString(int length, boolean fixed)
         throws IOException {
         StringBuilder string = new StringBuilder(16);

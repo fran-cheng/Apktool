@@ -19,6 +19,9 @@ package brut.androlib.res.data;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+/**
+ * Res下的values文件加
+ */
 public class ResValuesFile {
     private final ResPackage mPackage;
     private final ResTypeSpec mType;
@@ -33,8 +36,8 @@ public class ResValuesFile {
 
     public String getPath() {
         return "values" + mConfig.getFlags().getQualifiers() + "/"
-                + mType.getName() + (mType.getName().endsWith("s") ? "" : "s")
-                + ".xml";
+            + mType.getName() + (mType.getName().endsWith("s") ? "" : "s")
+            + ".xml";
     }
 
     public Set<ResResource> listResources() {
@@ -45,6 +48,12 @@ public class ResValuesFile {
         return mType;
     }
 
+    /**
+     * 是否综合
+     *
+     * @param res ResResource
+     * @return boolean
+     */
     public boolean isSynthesized(ResResource res) {
         return mPackage.isSynthesized(res.getResSpec().getId());
     }

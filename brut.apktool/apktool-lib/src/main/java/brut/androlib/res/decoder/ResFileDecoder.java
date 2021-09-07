@@ -30,6 +30,10 @@ import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Res相关文件解码，封装了处理，实际调用的是ResStreamDecoder容器里面的具体的流解码
+ */
+
 public class ResFileDecoder {
     /**
      * 容器
@@ -45,15 +49,25 @@ public class ResFileDecoder {
         this.mDecoders = decoders;
     }
 
+    /**
+     * Res文件解码
+     *
+     * @param res    ResResource
+     * @param inDir  Directory
+     * @param outDir Directory
+     * @throws AndrolibException 自定义异常
+     */
     public void decode(ResResource res, Directory inDir, Directory outDir)
         throws AndrolibException {
 
         ResFileValue fileValue = (ResFileValue) res.getValue();
+//        文件名
         String inFileName = fileValue.getStrippedPath();
         String outResName = res.getFilePath();
         String typeName = res.getResSpec().getType().getName();
 
         String ext = null;
+//        输出文件名
         String outFileName;
         int extPos = inFileName.lastIndexOf(".");
         if (extPos == -1) {
@@ -65,15 +79,19 @@ public class ResFileDecoder {
 
         try {
             if (typeName.equals("raw")) {
+//                raw类型资源
                 decode(inDir, inFileName, outDir, outFileName, "raw");
                 return;
             }
             if (typeName.equals("font") && !".xml".equals(ext)) {
+//                font类型
                 decode(inDir, inFileName, outDir, outFileName, "raw");
                 return;
             }
             if (typeName.equals("drawable") || typeName.equals("mipmap")) {
+//                drawable或mipmap资源
                 if (inFileName.toLowerCase().endsWith(".9" + ext)) {
+//                    .9图处理
                     outFileName = outResName + ".9" + ext;
 
                     // check for htc .r.9.png
@@ -112,17 +130,19 @@ public class ResFileDecoder {
                 // check for raw image
                 for (String extension : RAW_IMAGE_EXTENSIONS) {
                     if (inFileName.toLowerCase().endsWith("." + extension)) {
+//                        拷贝rawImage
                         copyRaw(inDir, outDir, inFileName, outFileName);
                         return;
                     }
                 }
 
                 if (!".xml".equals(ext)) {
+//                    非xml后缀的资源   都按raw处理
                     decode(inDir, inFileName, outDir, outFileName, "raw");
                     return;
                 }
             }
-
+//          解码xml
             decode(inDir, inFileName, outDir, outFileName, "xml");
         } catch (RawXmlEncounteredException ex) {
             // If we got an error to decode XML, lets assume the file is in raw format.
@@ -137,6 +157,16 @@ public class ResFileDecoder {
         }
     }
 
+    /**
+     * 解码资源文件
+     *
+     * @param inDir       输入文件夹
+     * @param inFileName  文件名
+     * @param outDir      输出文件夹
+     * @param outFileName 文件名
+     * @param decoder     文件后缀（解码方式）
+     * @throws AndrolibException 自定义异常
+     */
     public void decode(Directory inDir, String inFileName, Directory outDir,
                        String outFileName, String decoder) throws AndrolibException {
         try (
@@ -149,6 +179,15 @@ public class ResFileDecoder {
         }
     }
 
+    /**
+     * 直接拷贝文件
+     *
+     * @param inDir       输入文件夹
+     * @param inFilename  文件名
+     * @param outDir      输出文件夹
+     * @param outFilename 文件名
+     * @throws AndrolibException
+     */
     public void copyRaw(Directory inDir, Directory outDir, String inFilename,
                         String outFilename) throws AndrolibException {
         try {

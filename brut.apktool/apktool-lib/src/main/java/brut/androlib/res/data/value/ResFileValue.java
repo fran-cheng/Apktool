@@ -18,6 +18,9 @@ package brut.androlib.res.data.value;
 
 import brut.androlib.AndrolibException;
 
+/**
+ * Res文件的值
+ */
 public class ResFileValue extends ResIntBasedValue {
     private final String mPath;
 
@@ -26,6 +29,12 @@ public class ResFileValue extends ResIntBasedValue {
         this.mPath = path;
     }
 
+    /**
+     * 路径剥离，得到File文件
+     *
+     * @return String
+     * @throws AndrolibException 自定义异常
+     */
     public String getStrippedPath() throws AndrolibException {
         if (mPath.startsWith("res/")) {
             return mPath.substring(4);

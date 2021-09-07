@@ -16,17 +16,37 @@
  */
 package brut.androlib.res.data;
 
+/**
+ * Res的ID，占32位 ，如 0x 7F 01 0000
+ */
 public class ResID {
+    /**
+     * 包ID 占 8位， 0x7F
+     */
     public final int package_;
+    /**
+     * 类型，占8位，在package后面 如 0x7F01
+     */
     public final int type;
+    /**
+     * ID的入口，占16位
+     */
     public final int entry;
 
+    /**
+     * ID的值 为， 0xpackage__type_entry
+     */
     public final int id;
 
     public ResID(int package_, int type, int entry) {
         this(package_, type, entry, (package_ << 24) + (type << 16) + entry);
     }
 
+    /**
+     * 通过ID来构建ResId
+     *
+     * @param id id
+     */
     public ResID(int id) {
         this((id >> 24) & 0xff, (id >> 16) & 0x000000ff, id & 0x0000ffff, id);
     }
@@ -40,6 +60,8 @@ public class ResID {
 
     @Override
     public String toString() {
+//        %08x 需要使用4字节表达id 即16进制8位
+//        即转换为 0xFFFFFFFF之类的格式
         return String.format("0x%08x", id);
     }
 

@@ -18,6 +18,9 @@ package brut.androlib.err;
 
 import brut.androlib.AndrolibException;
 
+/**
+ * 找不到RawXml异常
+ */
 public class RawXmlEncounteredException extends AndrolibException {
     public RawXmlEncounteredException(String message, Throwable cause) {
         super(message, cause);

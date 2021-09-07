@@ -18,7 +18,10 @@ package brut.androlib.err;
 
 import brut.androlib.AndrolibException;
 
+/**
+ * 输出文件存在异常
+ */
 public class OutDirExistsException extends AndrolibException {
-	public OutDirExistsException() {
-	}
+    public OutDirExistsException() {
+    }
 }

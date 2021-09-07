@@ -139,6 +139,15 @@ final public class AndrolibResources {
         return (id == 0) ? pkgs[0] : pkgs[index];
     }
 
+    /**
+     * 加载框架文件
+     *
+     * @param resTable ResTable
+     * @param id       id
+     * @param frameTag 框架标识
+     * @return
+     * @throws AndrolibException
+     */
     public ResPackage loadFrameworkPkg(ResTable resTable, int id, String frameTag)
         throws AndrolibException {
         File apk = getFrameworkApk(id, frameTag);
@@ -285,7 +294,7 @@ final public class AndrolibResources {
     }
 
     /**
-     * 解码的操作
+     * 解码的Res，生成解码后文件
      *
      * @param resTable ResTable
      * @param apkFile  ExtFile
@@ -307,7 +316,6 @@ final public class AndrolibResources {
 
             inApk = apkFile.getDirectory();
 //            创建Res文件夹
-            // TODO: 2021/9/6  
             out = out.createDir("res");
             if (inApk.containsDir("res")) {
                 in = inApk.getDir("res");
@@ -323,23 +331,28 @@ final public class AndrolibResources {
         }
 
         ExtMXSerializer xmlSerializer = getResXmlSerializer();
+//        遍历listMainPackages
         for (ResPackage pkg : resTable.listMainPackages()) {
             attrDecoder.setCurrentPackage(pkg);
 
             LOGGER.info("Decoding file-resources...");
             for (ResResource res : pkg.listFiles()) {
+//                遍历解码Res文件
                 fileDecoder.decode(res, in, out);
             }
 
             LOGGER.info("Decoding values */* XMLs...");
             for (ResValuesFile valuesFile : pkg.listValuesFiles()) {
+//                遍历解码values */* XMLs 生成对应文件
                 generateValuesFile(valuesFile, out, xmlSerializer);
             }
             generatePublicXml(pkg, out, xmlSerializer);
         }
 
+
         AndrolibException decodeError = duo.m2.getFirstError();
         if (decodeError != null) {
+            //        有异常抛出异常
             throw decodeError;
         }
     }
@@ -828,21 +841,33 @@ final public class AndrolibResources {
         return serial;
     }
 
+    /**
+     * 生成value文件
+     *
+     * @param valuesFile ResValuesFile
+     * @param out        输出
+     * @param serial     ExtXmlSerializer 序列化
+     * @throws AndrolibException 自定义异常
+     */
     private void generateValuesFile(ResValuesFile valuesFile, Directory out,
                                     ExtXmlSerializer serial) throws AndrolibException {
         try {
             OutputStream outStream = out.getFileOutput(valuesFile.getPath());
             serial.setOutput((outStream), null);
             serial.startDocument(null, null);
+//            开始的第一个头标签
             serial.startTag(null, "resources");
 
             for (ResResource res : valuesFile.listResources()) {
                 if (valuesFile.isSynthesized(res)) {
+//                  跳过
                     continue;
                 }
+//               写入资源
                 ((ResValuesXmlSerializable) res.getValue()).serializeToResValuesXml(serial, res);
             }
 
+//            标签结尾
             serial.endTag(null, "resources");
             serial.newLine();
             serial.endDocument();
@@ -905,6 +930,14 @@ final public class AndrolibResources {
         }
     }
 
+    /**
+     * 获取框架文件
+     *
+     * @param id       id
+     * @param frameTag 框架标识
+     * @return File
+     * @throws AndrolibException 自定义异常
+     */
     public File getFrameworkApk(int id, String frameTag)
         throws AndrolibException {
         File dir = getFrameworkDir();
@@ -923,6 +956,7 @@ final public class AndrolibResources {
         }
 
         if (id == 1) {
+//            拷贝框架文件
             try (InputStream in = getAndroidFrameworkResourcesAsStream();
                  OutputStream out = new FileOutputStream(apk)) {
                 IOUtils.copy(in, out);
@@ -935,6 +969,11 @@ final public class AndrolibResources {
         throw new CantFindFrameworkResException(id);
     }
 
+    /**
+     * 清空框架文件
+     *
+     * @throws AndrolibException 自定义异常
+     */
     public void emptyFrameworkDirectory() throws AndrolibException {
         File dir = getFrameworkDir();
         File apk;
@@ -961,6 +1000,11 @@ final public class AndrolibResources {
         }
     }
 
+    /**
+     * 打印框架list
+     *
+     * @throws AndrolibException 自定义异常
+     */
     public void listFrameworkDirectory() throws AndrolibException {
         File dir = getFrameworkDir();
         if (dir == null) {
@@ -975,10 +1019,23 @@ final public class AndrolibResources {
         }
     }
 
+    /**
+     * 安装框架文件
+     *
+     * @param frameFile File
+     * @throws AndrolibException 自定义异常
+     */
     public void installFramework(File frameFile) throws AndrolibException {
         installFramework(frameFile, apkOptions.frameworkTag);
     }
 
+    /**
+     * 安装框架文件
+     *
+     * @param frameFile File
+     * @param tag       标识
+     * @throws AndrolibException 自定义异常
+     */
     public void installFramework(File frameFile, String tag)
         throws AndrolibException {
         InputStream in = null;
@@ -994,7 +1051,9 @@ final public class AndrolibResources {
             in = zip.getInputStream(entry);
             byte[] data = IOUtils.toByteArray(in);
 
+//            解码ARSCData
             ARSCData arsc = ARSCDecoder.decode(new ByteArrayInputStream(data), true, true);
+//            公有资源
             publicizeResources(data, arsc.getFlagsOffsets());
 
             File outFile = new File(getFrameworkDir(), String.valueOf(arsc
@@ -1015,6 +1074,7 @@ final public class AndrolibResources {
             out.closeEntry();
 
             //Write fake AndroidManifest.xml file to support original aapt
+//            写假AndroidManifest.xml文件来支持原来的aapt
             entry = zip.getEntry("AndroidManifest.xml");
             if (entry != null) {
                 in = zip.getInputStream(entry);
@@ -1067,6 +1127,12 @@ final public class AndrolibResources {
         }
     }
 
+    /**
+     * 框架文件所在文件夹
+     *
+     * @return File
+     * @throws AndrolibException 自定义异常
+     */
     public File getFrameworkDir() throws AndrolibException {
         if (mFrameworkDirectory != null) {
             return mFrameworkDirectory;
@@ -1075,14 +1141,17 @@ final public class AndrolibResources {
         String path;
 
         // if a framework path was specified on the command line, use it
+//        如果在命令行上指定了框架路径，则使用它
         if (apkOptions.frameworkFolderLocation != null) {
             path = apkOptions.frameworkFolderLocation;
         } else {
             File parentPath = new File(System.getProperty("user.home"));
 
             if (OSDetection.isMacOSX()) {
+//                MacOS
                 path = parentPath.getAbsolutePath() + String.format("%1$sLibrary%1$sapktool%1$sframework", File.separatorChar);
             } else if (OSDetection.isWindows()) {
+//                WindowOs
                 path = parentPath.getAbsolutePath() + String.format("%1$sAppData%1$sLocal%1$sapktool%1$sframework", File.separatorChar);
             } else {
                 path = parentPath.getAbsolutePath() + String.format("%1$s.local%1$sshare%1$sapktool%1$sframework", File.separatorChar);
@@ -1140,6 +1209,11 @@ final public class AndrolibResources {
         return apkOptions.isAapt2() ? 2 : 1;
     }
 
+    /**
+     * 从jar的resources下拿到 android-framework.jar
+     *
+     * @return InputStream
+     */
     public InputStream getAndroidFrameworkResourcesAsStream() {
         return Jar.class.getResourceAsStream("/brut/androlib/android-framework.jar");
     }
