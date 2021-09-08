@@ -19,15 +19,28 @@ package brut.androlib.res.data;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-// TODO: 2021/9/7  
+/**
+ * Res下的未知文件
+ */
 public class ResUnknownFiles {
 
     private final Map<String, String> mUnknownFiles = new LinkedHashMap<>();
 
+    /**
+     * 添加未知文件信息
+     *
+     * @param file  文件名(路径)
+     * @param value 压缩等级
+     */
     public void addUnknownFileInfo(String file, String value) {
         mUnknownFiles.put(file, value);
     }
 
+    /**
+     * 获得未知文件信息
+     *
+     * @return Map<String, String>
+     */
     public Map<String, String> getUnknownFiles() {
         return mUnknownFiles;
     }

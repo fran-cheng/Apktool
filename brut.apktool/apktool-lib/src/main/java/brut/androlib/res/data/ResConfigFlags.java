@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 
 /**
  * Res配置的标记
+ * 可以根据标记获取“限定符”等
  */
 public class ResConfigFlags {
     public final short mcc;

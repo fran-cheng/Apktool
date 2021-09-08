@@ -25,6 +25,9 @@ import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 
+/**
+ * Res的属性
+ */
 public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
     ResAttr(ResReferenceValue parentVal, int type, Integer min, Integer max,
             Boolean l10n) {
@@ -36,10 +39,18 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
     }
 
     public String convertToResXmlFormat(ResScalarValue value)
-            throws AndrolibException {
+        throws AndrolibException {
         return null;
     }
 
+    /**
+     * 序列化成Value下的xml
+     *
+     * @param serializer XmlSerializer
+     * @param res        Res资源
+     * @throws IOException       IO异常
+     * @throws AndrolibException 自定义异常
+     */
     @Override
     public void serializeToResValuesXml(XmlSerializer serializer,
                                         ResResource res) throws IOException, AndrolibException {
@@ -63,16 +74,29 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
         serializer.endTag(null, "attr");
     }
 
+    /**
+     * 静态方法， 创建ResAttr
+     *
+     * @param parent  ResReferenceValue
+     * @param items   Duo<Integer, ResScalarValue>[]
+     * @param factory ResValueFactory
+     * @param pkg     ResPackage
+     * @return ResAttr
+     * @throws AndrolibException 自定义异常
+     */
     public static ResAttr factory(ResReferenceValue parent,
                                   Duo<Integer, ResScalarValue>[] items, ResValueFactory factory,
                                   ResPackage pkg) throws AndrolibException {
 
+//        获取类型
         int type = ((ResIntValue) items[0].m2).getValue();
+//       &16位
         int scalarType = type & 0xffff;
         Integer min = null, max = null;
         Boolean l10n = null;
         int i;
         for (i = 1; i < items.length; i++) {
+//            选择ResTable_map_enrty下的ResTable_map下的ResTable_ref 即indent
             switch (items[i].m1) {
                 case BAG_KEY_ATTR_MIN:
                     min = ((ResIntValue) items[i].m2).getValue();
@@ -87,59 +111,75 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
             break;
         }
 
+//        如果for循环遍历完成,则用先用数据构建ResAttr
         if (i == items.length) {
             return new ResAttr(parent, scalarType, min, max, l10n);
         }
+//        没有遍历到的存放到attrItems
         Duo<ResReferenceValue, ResIntValue>[] attrItems = new Duo[items.length
-                - i];
+            - i];
         int j = 0;
         for (; i < items.length; i++) {
             int resId = items[i].m1;
+//            没有遍历到的resId,添加到ResPackage
             pkg.addSynthesizedRes(resId);
             attrItems[j++] = new Duo<ResReferenceValue, ResIntValue>(
-                    factory.newReference(resId, null),
-                    (ResIntValue) items[i].m2);
+                factory.newReference(resId, null),
+                (ResIntValue) items[i].m2);
         }
         switch (type & 0xff0000) {
             case TYPE_ENUM:
                 return new ResEnumAttr(parent, scalarType, min, max, l10n,
-                        attrItems);
+                    attrItems);
             case TYPE_FLAGS:
                 return new ResFlagsAttr(parent, scalarType, min, max, l10n,
-                        attrItems);
+                    attrItems);
         }
 
         throw new AndrolibException("Could not decode attr value");
     }
 
     protected void serializeBody(XmlSerializer serializer, ResResource res)
-            throws AndrolibException, IOException {
+        throws AndrolibException, IOException {
     }
 
+    /**
+     * 将mType转换成String
+     *
+     * @return String
+     */
     protected String getTypeAsString() {
         String s = "";
         if ((mType & TYPE_REFERENCE) != 0) {
+//            reference
             s += "|reference";
         }
         if ((mType & TYPE_STRING) != 0) {
+//            string
             s += "|string";
         }
         if ((mType & TYPE_INT) != 0) {
+//            integer
             s += "|integer";
         }
         if ((mType & TYPE_BOOL) != 0) {
+//            boolean
             s += "|boolean";
         }
         if ((mType & TYPE_COLOR) != 0) {
+//            color
             s += "|color";
         }
         if ((mType & TYPE_FLOAT) != 0) {
+//            float
             s += "|float";
         }
         if ((mType & TYPE_DIMEN) != 0) {
+//            dimension
             s += "|dimension";
         }
         if ((mType & TYPE_FRACTION) != 0) {
+//            fraction
             s += "|fraction";
         }
         if (s.isEmpty()) {
@@ -148,6 +188,9 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
         return s.substring(1);
     }
 
+    /**
+     * 类型的值
+     */
     private final int mType;
     private final Integer mMin;
     private final Integer mMax;

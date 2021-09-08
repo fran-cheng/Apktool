@@ -21,6 +21,9 @@ import brut.androlib.err.UndefinedResObjectException;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResResSpec;
 
+/**
+ * Res的参考值
+ */
 public class ResReferenceValue extends ResIntValue {
     private final ResPackage mPackage;
     private final boolean mTheme;

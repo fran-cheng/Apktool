@@ -16,6 +16,9 @@
  */
 package brut.androlib.res.data.value;
 
+/**
+ * Res的值
+ */
 public class ResValue {
 
 }

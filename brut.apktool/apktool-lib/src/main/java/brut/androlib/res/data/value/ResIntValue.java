@@ -19,6 +19,9 @@ package brut.androlib.res.data.value;
 import android.util.TypedValue;
 import brut.androlib.AndrolibException;
 
+/**
+ * 32位
+ */
 public class ResIntValue extends ResScalarValue {
     protected final int mValue;
     private int type;
@@ -33,6 +36,11 @@ public class ResIntValue extends ResScalarValue {
         this.mValue = value;
     }
 
+    /**
+     * 获取int值
+     *
+     * @return int
+     */
     public int getValue() {
         return mValue;
     }

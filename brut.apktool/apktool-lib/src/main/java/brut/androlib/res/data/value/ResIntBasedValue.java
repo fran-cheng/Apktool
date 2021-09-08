@@ -16,6 +16,9 @@
  */
 package brut.androlib.res.data.value;
 
+/**
+ * Res 32位的原始数值
+ */
 public class ResIntBasedValue extends ResValue {
     private final int mRawIntValue;
 

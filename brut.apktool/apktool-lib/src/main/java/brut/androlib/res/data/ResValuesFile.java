@@ -20,12 +20,24 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * Res下的values文件加
+ * Res下的values文件
  */
 public class ResValuesFile {
+    /**
+     * ResPackage
+     */
     private final ResPackage mPackage;
+    /**
+     * Res类型规则
+     */
     private final ResTypeSpec mType;
+    /**
+     * Res类型
+     */
     private final ResType mConfig;
+    /**
+     * Res资源集合
+     */
     private final Set<ResResource> mResources = new LinkedHashSet<ResResource>();
 
     public ResValuesFile(ResPackage pkg, ResTypeSpec type, ResType config) {
@@ -34,16 +46,31 @@ public class ResValuesFile {
         this.mConfig = config;
     }
 
+    /**
+     * 得到文件路径
+     *
+     * @return 资源文件路径（文件名）
+     */
     public String getPath() {
         return "values" + mConfig.getFlags().getQualifiers() + "/"
             + mType.getName() + (mType.getName().endsWith("s") ? "" : "s")
             + ".xml";
     }
 
+    /**
+     * Res资源集合
+     *
+     * @return Set<ResResource>
+     */
     public Set<ResResource> listResources() {
         return mResources;
     }
 
+    /**
+     * 获取类型
+     *
+     * @return ResTypeSpec
+     */
     public ResTypeSpec getType() {
         return mType;
     }
@@ -58,6 +85,11 @@ public class ResValuesFile {
         return mPackage.isSynthesized(res.getResSpec().getId());
     }
 
+    /**
+     * 添加Res资源文件
+     *
+     * @param res ResResource
+     */
     public void addResource(ResResource res) {
         mResources.add(res);
     }

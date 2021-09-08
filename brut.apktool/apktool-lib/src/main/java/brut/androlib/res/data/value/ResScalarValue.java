@@ -25,9 +25,16 @@ import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 
+/**
+ * Res标量值
+ * 将原始的 32位mRawValue  转换成了
+ */
 public abstract class ResScalarValue extends ResIntBasedValue implements
-        ResXmlEncodable, ResValuesXmlSerializable {
+    ResXmlEncodable, ResValuesXmlSerializable {
     protected final String mType;
+    /**
+     * 原始的值，如"color","dimen","fraction"等
+     */
     protected final String mRawValue;
 
     protected ResScalarValue(String type, int rawIntValue, String rawValue) {
@@ -36,6 +43,12 @@ public abstract class ResScalarValue extends ResIntBasedValue implements
         mRawValue = rawValue;
     }
 
+    /**
+     * 实现ResXmlEncodable 的 encodeAsResXmlAttr
+     *
+     * @return 属性的类型值
+     * @throws AndrolibException 自定义异常
+     */
     @Override
     public String encodeAsResXmlAttr() throws AndrolibException {
         if (mRawValue != null) {
@@ -44,10 +57,22 @@ public abstract class ResScalarValue extends ResIntBasedValue implements
         return encodeAsResXml();
     }
 
+    /**
+     * 解码获得xml 的Item标签的值
+     *
+     * @return String
+     * @throws AndrolibException 自定义异常
+     */
     public String encodeAsResXmlItemValue() throws AndrolibException {
         return encodeAsResXmlValue();
     }
 
+    /**
+     * 实现ResXmlEncodable 的 encodeAsResXmlValue
+     *
+     * @return 属性的原始值
+     * @throws AndrolibException 自定义异常
+     */
     @Override
     public String encodeAsResXmlValue() throws AndrolibException {
         if (mRawValue != null) {
@@ -56,8 +81,14 @@ public abstract class ResScalarValue extends ResIntBasedValue implements
         return encodeAsResXml();
     }
 
+    /**
+     * 解码xml文件的Item值
+     *
+     * @return 解码后获得的String
+     * @throws AndrolibException 自定义异常
+     */
     public String encodeAsResXmlNonEscapedItemValue() throws AndrolibException {
-        return encodeAsResXmlValue().replace("&amp;", "&").replace("&lt;","<");
+        return encodeAsResXmlValue().replace("&amp;", "&").replace("&lt;", "<");
     }
 
     public boolean hasMultipleNonPositionalSubstitutions() throws AndrolibException {

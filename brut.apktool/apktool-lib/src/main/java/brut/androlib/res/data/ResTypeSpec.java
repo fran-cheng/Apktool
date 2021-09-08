@@ -23,6 +23,7 @@ import java.util.*;
 
 /**
  * 资源类型规格
+ * 资源文件的名字
  */
 public final class ResTypeSpec {
 
@@ -69,6 +70,7 @@ public final class ResTypeSpec {
 
     /**
      * 获得type名
+     * 资源文件的名字
      *
      * @return String
      */

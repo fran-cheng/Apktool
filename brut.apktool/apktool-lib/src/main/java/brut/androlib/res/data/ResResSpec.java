@@ -122,6 +122,8 @@ public class ResResSpec {
 
     /**
      * 获取资源文件名
+     * <p>
+     * xml标签的属性名
      *
      * @return String
      */

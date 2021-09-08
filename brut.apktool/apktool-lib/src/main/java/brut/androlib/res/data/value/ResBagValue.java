@@ -24,30 +24,49 @@ import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 
+/**
+ * Res包装值
+ * 处理item
+ */
 public class ResBagValue extends ResValue implements ResValuesXmlSerializable {
+    /**
+     * Res参考值
+     */
     protected final ResReferenceValue mParent;
 
     public ResBagValue(ResReferenceValue parent) {
         this.mParent = parent;
     }
 
+    /**
+     * 序列化到values下
+     *
+     * @param serializer XmlSerializer
+     * @param res        Res资源
+     * @throws IOException       IO异常
+     * @throws AndrolibException 自定义异常
+     */
     @Override
     public void serializeToResValuesXml(XmlSerializer serializer,
                                         ResResource res) throws IOException, AndrolibException {
+        //        资源类型
         String type = res.getResSpec().getType().getName();
         if ("style".equals(type)) {
+//            style类型的生成 styles.xml
             new ResStyleValue(mParent, new Duo[0], null)
-                    .serializeToResValuesXml(serializer, res);
+                .serializeToResValuesXml(serializer, res);
             return;
         }
         if ("array".equals(type)) {
+//            array类型的生成 arrays.xml
             new ResArrayValue(mParent, new Duo[0]).serializeToResValuesXml(
-                    serializer, res);
+                serializer, res);
             return;
         }
         if ("plurals".equals(type)) {
+//            plurals类型的生成 plurals.xml
             new ResPluralsValue(mParent, new Duo[0]).serializeToResValuesXml(
-                    serializer, res);
+                serializer, res);
             return;
         }
 
@@ -57,6 +76,11 @@ public class ResBagValue extends ResValue implements ResValuesXmlSerializable {
         serializer.endTag(null, "item");
     }
 
+    /**
+     * 获取  模板？
+     *
+     * @return ResReferenceValue
+     */
     public ResReferenceValue getParent() {
         return mParent;
     }
