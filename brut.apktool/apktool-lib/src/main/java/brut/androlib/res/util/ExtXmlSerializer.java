@@ -20,6 +20,9 @@ import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 
+/**
+ * 序列化
+ */
 public interface ExtXmlSerializer extends XmlSerializer {
 
     public ExtXmlSerializer newLine() throws IOException;

@@ -23,17 +23,30 @@ import brut.androlib.res.data.ResResSpec;
 import brut.androlib.res.data.value.ResAttr;
 import brut.androlib.res.data.value.ResScalarValue;
 
+/**
+ * Res属性解码
+ */
 public class ResAttrDecoder {
+    /**
+     * 解码
+     *
+     * @param type      类型
+     * @param value     data值
+     * @param rawValue  rawValue
+     * @param attrResId attrResId 属性资源ID
+     * @return String 属性
+     * @throws AndrolibException 自定义异常
+     */
     public String decode(int type, int value, String rawValue, int attrResId)
-            throws AndrolibException {
+        throws AndrolibException {
         ResScalarValue resValue = mCurrentPackage.getValueFactory().factory(
-                type, value, rawValue);
+            type, value, rawValue);
 
         String decoded = null;
         if (attrResId > 0) {
             try {
                 ResAttr attr = (ResAttr) getCurrentPackage().getResTable()
-                        .getResSpec(attrResId).getDefaultResource().getValue();
+                    .getResSpec(attrResId).getDefaultResource().getValue();
 
                 decoded = attr.convertToResXmlFormat(resValue);
             } catch (UndefinedResObjectException | ClassCastException ex) {
@@ -44,6 +57,13 @@ public class ResAttrDecoder {
         return decoded != null ? decoded : resValue.encodeAsResXmlAttr();
     }
 
+    /**
+     * 解码清单文件的属性
+     *
+     * @param attrResId attrResId
+     * @return String
+     * @throws AndrolibException 自定义异常
+     */
     public String decodeManifestAttr(int attrResId)
         throws AndrolibException {
 
@@ -58,6 +78,12 @@ public class ResAttrDecoder {
         return null;
     }
 
+    /**
+     * 获得当前的package
+     *
+     * @return ResPackage
+     * @throws AndrolibException 自定义异常
+     */
     public ResPackage getCurrentPackage() throws AndrolibException {
         if (mCurrentPackage == null) {
             throw new AndrolibException("Current package not set");

@@ -25,6 +25,9 @@ import java.nio.ByteBuffer;
 import java.nio.charset.*;
 import java.util.logging.Logger;
 
+/**
+ * String块
+ */
 public class StringBlock {
 
     /**
@@ -93,6 +96,7 @@ public class StringBlock {
 
     /**
      * Returns raw string (without any styling information) at specified index.
+     * 在指定的索引处返回原始字符串(没有任何样式信息)。
      *
      * @param index int
      * @return String
@@ -118,6 +122,7 @@ public class StringBlock {
 
     /**
      * Returns string with style tags (html-like).
+     * 返回带有样式标签的字符串(类似html)。
      *
      * @param index int
      * @return String
@@ -133,6 +138,7 @@ public class StringBlock {
         }
 
         // If the returned style is further in string, than string length. Lets skip it.
+//        如果返回的样式大于字符串长度。让我们跳过它。
         if (style[1] > raw.length()) {
             return ResXmlEncoders.escapeXmlChars(raw);
         }
@@ -186,6 +192,13 @@ public class StringBlock {
         return html.toString();
     }
 
+    /**
+     * 输出样式标签
+     *
+     * @param tag     tag
+     * @param builder builder
+     * @param close   close
+     */
     private void outputStyleTag(String tag, StringBuilder builder, boolean close) {
         builder.append('<');
         if (close) {
@@ -205,6 +218,9 @@ public class StringBlock {
                     // malformed style information will cause crash. so
                     // prematurely end style tags, if recreation
                     // cannot be created.
+//                    不正确的样式信息将导致崩溃。所以
+//                    过早结束样式标签，如果重新创建
+//                     无法创建。
                     if (pos2 != -1) {
                         builder.append(' ').append(tag.substring(pos + 1, pos2)).append("=\"");
                         pos = tag.indexOf(';', pos2 + 1);
@@ -230,9 +246,10 @@ public class StringBlock {
 
     /**
      * Finds index of the string. Returns -1 if the string was not found.
+     * 查找字符串的索引。如果未找到字符串，则返回-1。
      *
-     * @param string String to index location of
-     * @return int (Returns -1 if not found)
+     * @param string String to index location of 索引的位置
+     * @return int (Returns -1 if not found) 如果未找到则返回-1
      */
     public int find(String string) {
         if (string == null) {
@@ -271,6 +288,10 @@ public class StringBlock {
      * Returns style information - array of int triplets, where in each triplet:
      * * first int is index of tag name ('b','i', etc.) * second int is tag
      * start index in string * third int is tag end index in string
+     * <p>
+     * 返回样式信息——int三元组的数组，其中每个三元组:
+     * 第一个int是标签名称('b'，'i'等)的索引*第二个int是标签
+     * string * third int的起始索引是string中的标签结束索引
      */
     private int[] getStyle(int index) {
         if (m_styleOffsets == null || m_styles == null || index >= m_styleOffsets.length) {
@@ -301,6 +322,13 @@ public class StringBlock {
         return style;
     }
 
+    /**
+     * 解码字符串，
+     *
+     * @param offset 位移
+     * @param length 字符串长度
+     * @return
+     */
     @VisibleForTesting
     String decodeString(int offset, int length) {
         try {
@@ -317,6 +345,8 @@ public class StringBlock {
             final ByteBuffer wrappedBufferRetry = ByteBuffer.wrap(m_strings, offset, length);
             // in some places, Android uses 3-byte UTF-8 sequences instead of 4-bytes.
             // If decoding failed, we try to use CESU-8 decoder, which is closer to what Android actually uses.
+//            在某些地方，Android使用3字节的UTF-8序列而不是4字节。
+//            如果解码失败，我们尝试使用CESU-8解码器，更接近Android实际使用的解码器。
             return CESU8_DECODER.decode(wrappedBufferRetry).toString();
         } catch (CharacterCodingException e) {
             LOGGER.warning("Failed to decode a string with CESU-8 decoder.");
@@ -324,20 +354,36 @@ public class StringBlock {
         }
     }
 
+    /**
+     * 获取Short长度
+     *
+     * @param array  byte[]
+     * @param offset int
+     * @return int
+     */
     private static final int getShort(byte[] array, int offset) {
         return (array[offset + 1] & 0xff) << 8 | array[offset] & 0xff;
     }
 
+    /**
+     * 获得UTF8长度的数组 （4字节）
+     *
+     * @param array  array
+     * @param offset offset
+     * @return int[]
+     */
     private static final int[] getUtf8(byte[] array, int offset) {
         int val = array[offset];
         int length;
         // We skip the utf16 length of the string
+//        我们跳过字符串的utf16长度
         if ((val & 0x80) != 0) {
             offset += 2;
         } else {
             offset += 1;
         }
         // And we read only the utf-8 encoded length of the string
+//        我们只读取utf-8编码的字符串长度
         val = array[offset];
         offset += 1;
         if ((val & 0x80) != 0) {
@@ -350,6 +396,13 @@ public class StringBlock {
         return new int[]{offset, length};
     }
 
+    /**
+     * 获取UTF16长度的数组
+     *
+     * @param array  array
+     * @param offset offset
+     * @return int[]
+     */
     private static final int[] getUtf16(byte[] array, int offset) {
         int val = ((array[offset + 1] & 0xFF) << 8 | array[offset] & 0xFF);
 
@@ -363,10 +416,25 @@ public class StringBlock {
         return new int[]{2, val * 2};
     }
 
+    /**
+     * 字符串偏移量数组
+     */
     private int[] m_stringOffsets;
+    /**
+     * 字符串数组
+     */
     private byte[] m_strings;
+    /**
+     * 样式偏移量数组
+     */
     private int[] m_styleOffsets;
+    /**
+     * 样式
+     */
     private int[] m_styles;
+    /**
+     * 是否UTF8编码
+     */
     private boolean m_isUTF8;
 
     private final CharsetDecoder UTF16LE_DECODER = Charset.forName("UTF-16LE").newDecoder();

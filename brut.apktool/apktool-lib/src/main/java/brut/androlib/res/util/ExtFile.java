@@ -18,7 +18,9 @@ package brut.androlib.res.util;
 
 import java.io.File;
 
-
+/**
+ * 提取文件
+ */
 public class ExtFile extends brut.directory.ExtFile {
     public ExtFile(File file) {
         super(file.getPath());

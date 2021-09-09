@@ -32,7 +32,7 @@ public class AndroidManifestResourceParser extends AXmlResourceParser {
      * some apps intentionally coerce integers to be strings by prepending an escaped space.
      * For details/discussion, see https://stackoverflow.com/questions/2154945/how-to-force-a-meta-data-value-to-type-string
      * With aapt1, the escaped space is dropped when encoded. For aapt2, the escaped space is preserved.
-     *
+     * <p>
      * *匹配数字字符串元数据值的模式。Aapt自动推断
      * 类型用于基于未编码XML中的字符串的清单元数据值。然而,
      * *一些应用程序故意通过前置转义空格来强制整数为字符串。
@@ -41,6 +41,12 @@ public class AndroidManifestResourceParser extends AXmlResourceParser {
      */
     private static final Pattern PATTERN_NUMERIC_STRING = Pattern.compile("\\s?\\d+");
 
+    /**
+     * 获得属性值
+     *
+     * @param index
+     * @return String
+     */
     @Override
     public String getAttributeValue(int index) {
         String value = super.getAttributeValue(index);
@@ -61,7 +67,8 @@ public class AndroidManifestResourceParser extends AXmlResourceParser {
     }
 
     /**
-     * 判断改元数据是否是int
+     * 判断该元数据是否是int
+     *
      * @param index 下标
      * @param value 值
      * @return boolean

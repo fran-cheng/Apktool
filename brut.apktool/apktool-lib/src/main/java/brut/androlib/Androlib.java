@@ -1070,7 +1070,7 @@ public class Androlib {
     }
 
     /**
-     * 从使用的框架解析
+     * 解析使用的框架
      *
      * @param usesFramework usesFramework
      * @return File[]

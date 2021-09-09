@@ -25,12 +25,20 @@ public class ApkOptions {
     public boolean forceBuildAll = false;
     public boolean forceDeleteFramework = false;
     public boolean debugMode = false;
+    /**
+     * 详细日志
+     */
     public boolean verbose = false;
     public boolean copyOriginalFiles = false;
     public boolean updateFiles = false;
     public boolean isFramework = false;
     public boolean resourcesAreCompressed = false;
     public boolean useAapt2 = false;
+    /**
+     * 在构建步骤中禁用资源文件的处理。
+     * //            停用 PNG 处理。
+     * //如果您已处理 PNG 文件，或者要创建不需要减小文件大小的调试 build，则可使用此选项。启用此选项可以加快执行速度，但会增大输出文件大小。
+     */
     public boolean noCrunch = false;
     public int forceApi = 0;
     public Collection<String> doNotCompress;

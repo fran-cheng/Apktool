@@ -23,12 +23,27 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 将XML编码成文件的形式 “ 转义”
+ */
 public final class ResXmlEncoders {
 
+    /**
+     * 避开xml的字符
+     *
+     * @param str String
+     * @return String
+     */
     public static String escapeXmlChars(String str) {
         return StringUtils.replace(StringUtils.replace(str, "&", "&amp;"), "<", "&lt;");
     }
 
+    /**
+     * 编码成xml属性的样式
+     *
+     * @param str
+     * @return String
+     */
     public static String encodeAsResXmlAttr(String str) {
         if (str == null || str.isEmpty()) {
             return str;
@@ -67,6 +82,12 @@ public final class ResXmlEncoders {
         return out.toString();
     }
 
+    /**
+     * 值的转义
+     *
+     * @param str String
+     * @return String
+     */
     public static String encodeAsXmlValue(String str) {
         if (str == null || str.isEmpty()) {
             return str;
@@ -138,11 +159,23 @@ public final class ResXmlEncoders {
         return out.toString();
     }
 
+    /**
+     * 是否有多位置替换
+     *
+     * @param str String
+     * @return boolean
+     */
     public static boolean hasMultipleNonPositionalSubstitutions(String str) {
         Duo<List<Integer>, List<Integer>> tuple = findSubstitutions(str, 4);
-        return ! tuple.m1.isEmpty() && tuple.m1.size() + tuple.m2.size() > 1;
+        return !tuple.m1.isEmpty() && tuple.m1.size() + tuple.m2.size() > 1;
     }
 
+    /**
+     * 枚举必要的替换
+     *
+     * @param str String
+     * @return String
+     */
     public static String enumerateNonPositionalSubstitutionsIfRequired(String str) {
         Duo<List<Integer>, List<Integer>> tuple = findSubstitutions(str, 4);
         if (tuple.m1.isEmpty() || tuple.m1.size() + tuple.m2.size() < 2) {
@@ -164,8 +197,12 @@ public final class ResXmlEncoders {
 
     /**
      * It returns a tuple of:
-     *   - a list of offsets of non positional substitutions. non-pos is defined as any "%" which isn't "%%" nor "%\d+\$"
-     *   - a list of offsets of positional substitutions
+     * - a list of offsets of non positional substitutions. non-pos is defined as any "%" which isn't "%%" nor "%\d+\$"
+     * - a list of offsets of positional substitutions
+     * <p>
+     * 它返回一个元组:
+     * 非位置替换的偏移量列表。非pos定义为任何“%”，不是“%%”，也不是“%\d+\$”
+     * 位置替换的偏移量列表
      */
     private static Duo<List<Integer>, List<Integer>> findSubstitutions(String str, int nonPosMax) {
         if (nonPosMax == -1) {
@@ -193,7 +230,7 @@ public final class ResXmlEncoders {
                 continue;
             }
             if (c >= '0' && c <= '9' && pos2 < length) {
-                while ((c = str.charAt(pos2++)) >= '0' && c <= '9' && pos2 < length);
+                while ((c = str.charAt(pos2++)) >= '0' && c <= '9' && pos2 < length) ;
                 if (c == '$') {
                     positional.add(pos);
                     continue;
@@ -209,9 +246,14 @@ public final class ResXmlEncoders {
         return new Duo<>(nonPositional, positional);
     }
 
+    /**
+     * 是否是可以转义的
+     * @param c char
+     * @return boolean
+     */
     private static boolean isPrintableChar(char c) {
         Character.UnicodeBlock block = Character.UnicodeBlock.of(c);
         return !Character.isISOControl(c) && c != KeyEvent.CHAR_UNDEFINED
-                && block != null && block != Character.UnicodeBlock.SPECIALS;
+            && block != null && block != Character.UnicodeBlock.SPECIALS;
     }
 }

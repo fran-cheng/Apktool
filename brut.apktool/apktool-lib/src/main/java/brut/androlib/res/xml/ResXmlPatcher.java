@@ -37,6 +37,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+/**
+ * RexXml补丁
+ */
 public final class ResXmlPatcher {
 
     /**

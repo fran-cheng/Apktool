@@ -24,9 +24,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class ResRawStreamDecoder implements ResStreamDecoder {
+    /**
+     * 解码，实际是把raw文件拷贝
+     *
+     * @param in  InputStream
+     * @param out OutputStream
+     * @throws AndrolibException 自定义异常
+     */
     @Override
     public void decode(InputStream in, OutputStream out)
-            throws AndrolibException {
+        throws AndrolibException {
         try {
             IOUtils.copy(in, out);
         } catch (IOException ex) {

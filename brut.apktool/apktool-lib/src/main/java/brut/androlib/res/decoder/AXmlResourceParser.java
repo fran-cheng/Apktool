@@ -69,6 +69,7 @@ public class AXmlResourceParser implements XmlResourceParser {
 
     /**
      * ResAttrDecoder
+     * 获得ResAttrDecoder
      *
      * @return ResAttrDecoder
      */

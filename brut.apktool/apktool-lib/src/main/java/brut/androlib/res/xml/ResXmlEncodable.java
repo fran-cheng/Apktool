@@ -18,6 +18,9 @@ package brut.androlib.res.xml;
 
 import brut.androlib.AndrolibException;
 
+/**
+ * 抽象处理
+ */
 public interface ResXmlEncodable {
     public String encodeAsResXmlAttr() throws AndrolibException;
 

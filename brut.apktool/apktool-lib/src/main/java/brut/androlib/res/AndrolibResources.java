@@ -357,6 +357,11 @@ final public class AndrolibResources {
         }
     }
 
+    /**
+     * 设置SDK信息
+     *
+     * @param map Map
+     */
     public void setSdkInfo(Map<String, String> map) {
         if (map != null) {
             mMinSdkVersion = map.get("minSdkVersion");
@@ -365,6 +370,11 @@ final public class AndrolibResources {
         }
     }
 
+    /**
+     * 设置版本信息
+     *
+     * @param versionInfo VersionInfo
+     */
     public void setVersionInfo(VersionInfo versionInfo) {
         if (versionInfo != null) {
             mVersionCode = versionInfo.versionCode;
@@ -372,26 +382,51 @@ final public class AndrolibResources {
         }
     }
 
+    /**
+     * 设置包名重命名
+     *
+     * @param packageInfo PackageInfo
+     */
     public void setPackageRenamed(PackageInfo packageInfo) {
         if (packageInfo != null) {
             mPackageRenamed = packageInfo.renameManifestPackage;
         }
     }
 
+    /**
+     * 设置包ID
+     *
+     * @param packageInfo PackageInfo
+     */
     public void setPackageId(PackageInfo packageInfo) {
         if (packageInfo != null) {
             mPackageId = packageInfo.forcedPackageId;
         }
     }
 
+    /**
+     * 设置共享库
+     *
+     * @param flag boolean
+     */
     public void setSharedLibrary(boolean flag) {
         mSharedLibrary = flag;
     }
 
+    /**
+     * 设置稀有资源
+     *
+     * @param flag boolean
+     */
     public void setSparseResources(boolean flag) {
         mSparseResources = flag;
     }
 
+    /**
+     * 检查目标SDK版本
+     *
+     * @return String
+     */
     public String checkTargetSdkVersionBounds() {
         int target = mapSdkShorthandToVersion(mTargetSdkVersion);
 
@@ -403,6 +438,13 @@ final public class AndrolibResources {
         return Integer.toString(target);
     }
 
+    /**
+     * 创建不压缩文件
+     *
+     * @param apkOptions ApkOptions
+     * @return doNotCompressFile
+     * @throws AndrolibException 自定义异常
+     */
     private File createDoNotCompressExtensionsFile(ApkOptions apkOptions) throws AndrolibException {
         if (apkOptions.doNotCompress == null || apkOptions.doNotCompress.isEmpty()) {
             return null;
@@ -426,14 +468,30 @@ final public class AndrolibResources {
         }
     }
 
+    /**
+     * 使用AAPT 2 打包
+     *
+     * @param apkFile    临时生成的文件夹
+     * @param manifest   解包后的manifest文件
+     * @param resDir     解包后的Res文件夹
+     * @param rawDir     解包后的.9图
+     * @param assetDir   解包后的AssetDir
+     * @param include    包括的文件====> 使用的框架文件
+     * @param cmd        命令List
+     * @param customAapt build命令是否有指定AAPT
+     * @throws AndrolibException 自定义异常
+     */
     private void aapt2Package(File apkFile, File manifest, File resDir, File rawDir, File assetDir, File[] include,
                               List<String> cmd, boolean customAapt)
         throws AndrolibException {
+
+//       详情@https://developer.android.google.cn/studio/command-line/aapt2?hl=zh_cn
 
         List<String> compileCommand = new ArrayList<>(cmd);
         File resourcesZip = null;
 
         if (resDir != null) {
+//            创建build/resources.zip
             File buildDir = new File(resDir.getParent(), "build");
             resourcesZip = new File(buildDir, "resources.zip");
         }
@@ -441,29 +499,41 @@ final public class AndrolibResources {
         if (resDir != null && !resourcesZip.exists()) {
 
             // Compile the files into flat arsc files
+//            将文件编译成.flat的arsc文件
+//            编译命令
             cmd.add("compile");
 
+//            使用 --dir 标记将包含多个资源文件的资源目录传递给 AAPT2，但如果这样做，您将无法获得增量资源编译的优势。
+//            也就是说，如果传递整个目录，即使只有一项资源发生了改变，AAPT2 也会重新编译目录中的所有文件。
             cmd.add("--dir");
             cmd.add(resDir.getAbsolutePath());
 
             // Treats error that used to be valid in aapt1 as warnings in aapt2
+//            将在aapt1中有效的错误视为aapt2中的警告
             cmd.add("--legacy");
 
             File buildDir = new File(resDir.getParent(), "build");
             resourcesZip = new File(buildDir, "resources.zip");
 
+//            指定已编译资源的输出路径。
             cmd.add("-o");
             cmd.add(resourcesZip.getAbsolutePath());
 
             if (apkOptions.verbose) {
+//                启用详细日志记录。
                 cmd.add("-v");
             }
 
             if (apkOptions.noCrunch) {
+//            停用 PNG 处理。
+//            如果您已处理 PNG 文件，或者要创建不需要减小文件大小的调试 build，则可使用此选项。启用此选项可以加快执行速度，但会增大输出文件大小。
+//                除 res/values/ 目录下的文件以外的其他所有文件都将转换为扩展名为 *.flat 的二进制 XML 文件。
+//                此外，默认情况下，所有 PNG 文件都会被压缩，并采用 *.png.flat 扩展名。如果选择不压缩 PNG，您可以在编译期间使用 --no-crunch 选项
                 cmd.add("--no-crunch");
             }
 
             try {
+//                执行命令
                 OS.exec(cmd.toArray(new String[0]));
                 LOGGER.fine("aapt2 compile command ran: ");
                 LOGGER.fine(cmd.toString());
@@ -477,7 +547,13 @@ final public class AndrolibResources {
         }
 
         // Link them into the final apk, reusing our old command after clearing for the aapt2 binary
+//        将它们链接到最终的apk中，在清除aapt2二进制文件后重用我们的旧命令
         cmd = new ArrayList<>(compileCommand);
+//        在链接阶段，AAPT2 会合并在编译阶段生成的所有中间文件（如资源表、二进制 XML 文件和处理过的 PNG 文件），并将它们打包成一个 APK。
+//        此外，在此阶段还会生成其他辅助文件，如 R.java 和 ProGuard 规则文件。
+//        不过，生成的 APK 不包含 DEX 字节码且未签名。也就是说，您无法将此 APK 部署到设备。
+//        如果您不使用 Android Gradle 插件从命令行构建应用，则可以使用其他命令行工具
+//        如使用 d8 将 Java 字节码编译为 DEX 字节码，以及使用 apksigner 为 APK 签名。
         cmd.add("link");
 
         cmd.add("-o");
@@ -589,6 +665,19 @@ final public class AndrolibResources {
         }
     }
 
+    /**
+     * 区分AAPT2  所以这里搞了个AAPT1
+     *
+     * @param apkFile    临时生成的文件夹
+     * @param manifest   解包后的manifest文件
+     * @param resDir     解包后的Res文件夹
+     * @param rawDir     解包后的.9图
+     * @param assetDir   解包后的AssetDir
+     * @param include    包括的文件====> 使用的框架文件
+     * @param cmd        命令List
+     * @param customAapt build命令是否有指定AAPT
+     * @throws AndrolibException 自定义异常
+     */
     private void aapt1Package(File apkFile, File manifest, File resDir, File rawDir, File assetDir, File[] include,
                               List<String> cmd, boolean customAapt)
         throws AndrolibException {
@@ -596,24 +685,32 @@ final public class AndrolibResources {
         cmd.add("p");
 
         if (apkOptions.verbose) { // output aapt verbose
+//            输出aapt详细
             cmd.add("-v");
         }
         if (apkOptions.updateFiles) {
             cmd.add("-u");
         }
         if (apkOptions.debugMode) { // inject debuggable="true" into manifest
+//           将debuggable="true"注入manifest
             cmd.add("--debug-mode");
         }
         if (apkOptions.noCrunch) {
+//            在构建步骤中禁用资源文件的处理。
+//            停用 PNG 处理。
+//如果您已处理 PNG 文件，或者要创建不需要减小文件大小的调试 build，则可使用此选项。启用此选项可以加快执行速度，但会增大输出文件大小。
             cmd.add("--no-crunch");
         }
         // force package id so that some frameworks build with correct id
         // disable if user adds own aapt (can't know if they have this feature)
         if (mPackageId != null && !customAapt && !mSharedLibrary) {
+//            强制包id，以便一些框架使用正确的id构建
+//            如果用户添加了自己的aapt则禁用(不知道他们是否有这个功能)
             cmd.add("--forced-package-id");
             cmd.add(mPackageId);
         }
         if (mSharedLibrary) {
+//            是否共享库
             cmd.add("--shared-lib");
         }
         if (mMinSdkVersion != null) {
@@ -704,14 +801,27 @@ final public class AndrolibResources {
         }
     }
 
+    /**
+     * 使用AAPT进行打包
+     *
+     * @param apkFile  临时生成的文件夹
+     * @param manifest 解包后的manifest文件
+     * @param resDir   解包后的Res文件夹
+     * @param rawDir   解包后的.9图
+     * @param assetDir 解包后的AssetDir
+     * @param include  包括的文件====> 使用的框架文件
+     * @throws AndrolibException 自定义异常
+     */
     public void aaptPackage(File apkFile, File manifest, File resDir, File rawDir, File assetDir, File[] include)
         throws AndrolibException {
 
+//        AAPT的路径
         String aaptPath = apkOptions.aaptPath;
         boolean customAapt = !aaptPath.isEmpty();
         List<String> cmd = new ArrayList<String>();
 
         try {
+//            获取AAPT路径
             String aaptCommand = AaptManager.getAaptExecutionCommand(aaptPath, getAaptBinaryFile());
             cmd.add(aaptCommand);
         } catch (BrutException ex) {
@@ -1194,6 +1304,12 @@ final public class AndrolibResources {
         return dir;
     }
 
+    /**
+     * 获取AAPT二进制文件
+     *
+     * @return File
+     * @throws AndrolibException 自定义异常
+     */
     private File getAaptBinaryFile() throws AndrolibException {
         try {
             if (getAaptVersion() == 2) {
@@ -1205,6 +1321,11 @@ final public class AndrolibResources {
         }
     }
 
+    /**
+     * 使用的AAPT版本
+     *
+     * @return int
+     */
     private int getAaptVersion() {
         return apkOptions.isAapt2() ? 2 : 1;
     }

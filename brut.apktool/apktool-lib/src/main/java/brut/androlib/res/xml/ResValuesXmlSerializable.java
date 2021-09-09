@@ -22,6 +22,9 @@ import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 
+/**
+ * Res下的value的序列化
+ */
 public interface ResValuesXmlSerializable {
     public void serializeToResValuesXml(XmlSerializer serializer,
                                         ResResource res) throws IOException, AndrolibException;

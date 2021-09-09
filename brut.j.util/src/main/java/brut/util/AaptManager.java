@@ -17,25 +17,48 @@
 package brut.util;
 
 import brut.common.BrutException;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * AAPT管理
+ */
 public class AaptManager {
 
+    /**
+     * 获取AAPT 2 二进制文件
+     *
+     * @return File
+     * @throws BrutException 自定义异常
+     */
     public static File getAapt2() throws BrutException {
         return getAapt(2);
     }
 
+    /**
+     * 获取AAPT 1 二进制文件
+     *
+     * @return File
+     * @throws BrutException 自定义异常
+     */
     public static File getAapt1() throws BrutException {
         return getAapt(1);
     }
 
+    /**
+     * 获取AAPT   二进制文件
+     *
+     * @return File
+     * @throws BrutException 自定义异常
+     */
     private static File getAapt(Integer version) throws BrutException {
         File aaptBinary;
         String aaptVersion = getAaptBinaryName(version);
 
-        if (! OSDetection.is64Bit() && OSDetection.isMacOSX()) {
+        if (!OSDetection.is64Bit() && OSDetection.isMacOSX()) {
+//            mac下只有64位 二进制文件
             throw new BrutException("32 bit OS detected. No 32 bit binaries available.");
         }
 
@@ -63,8 +86,16 @@ public class AaptManager {
         throw new BrutException("Can't set aapt binary as executable");
     }
 
+    /**
+     * 获取AAPT的执行命令
+     *
+     * @param aaptPath aaptPath路径
+     * @param aapt
+     * @return String
+     * @throws BrutException 自定义异常
+     */
     public static String getAaptExecutionCommand(String aaptPath, File aapt) throws BrutException {
-        if (! aaptPath.isEmpty()) {
+        if (!aaptPath.isEmpty()) {
             File aaptFile = new File(aaptPath);
             if (aaptFile.canRead() && aaptFile.exists()) {
                 aaptFile.setExecutable(true);

@@ -20,6 +20,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
+/**
+ * 提取文件
+ */
 public class ExtFile extends File {
     public ExtFile(File file) {
         super(file.getPath());
