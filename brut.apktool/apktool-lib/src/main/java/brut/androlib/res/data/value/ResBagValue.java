@@ -77,8 +77,7 @@ public class ResBagValue extends ResValue implements ResValuesXmlSerializable {
     }
 
     /**
-     * 获取  模板？
-     *
+     *ResReferenceValue
      * @return ResReferenceValue
      */
     public ResReferenceValue getParent() {

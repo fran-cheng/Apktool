@@ -27,6 +27,7 @@ import java.util.Set;
 
 /**
  * 资源（规格）说明
+ * Res标签的属性
  */
 public class ResResSpec {
     /**
@@ -35,6 +36,7 @@ public class ResResSpec {
     private final ResID mId;
     /**
      * 资源文件名
+     * 标签的属性name
      */
     private final String mName;
     /**
@@ -52,7 +54,7 @@ public class ResResSpec {
 
     /**
      * @param id   资源的ID值
-     * @param name 资源名字
+     * @param name 资源名字 标签的name属性
      * @param pkg  ResPackage
      * @param type 资源类型规格
      */

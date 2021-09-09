@@ -70,6 +70,7 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
         if (mL10n != null && mL10n) {
             serializer.attribute(null, "localization", "suggested");
         }
+//        序列化body
         serializeBody(serializer, res);
         serializer.endTag(null, "attr");
     }
@@ -115,7 +116,7 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
         if (i == items.length) {
             return new ResAttr(parent, scalarType, min, max, l10n);
         }
-//        没有遍历到的存放到attrItems
+//      attrItems 存放没有遍历到的
         Duo<ResReferenceValue, ResIntValue>[] attrItems = new Duo[items.length
             - i];
         int j = 0;
@@ -123,15 +124,18 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
             int resId = items[i].m1;
 //            没有遍历到的resId,添加到ResPackage
             pkg.addSynthesizedRes(resId);
+//             没有遍历到的resId,添加到attrItems
             attrItems[j++] = new Duo<ResReferenceValue, ResIntValue>(
                 factory.newReference(resId, null),
                 (ResIntValue) items[i].m2);
         }
         switch (type & 0xff0000) {
             case TYPE_ENUM:
+//                ResTable_map_entry 下的 map的data_type
                 return new ResEnumAttr(parent, scalarType, min, max, l10n,
                     attrItems);
             case TYPE_FLAGS:
+//                ResTable_map_entry 下的 map的data_type
                 return new ResFlagsAttr(parent, scalarType, min, max, l10n,
                     attrItems);
         }
@@ -139,6 +143,14 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
         throw new AndrolibException("Could not decode attr value");
     }
 
+    /**
+     * 序列化body部分
+     *
+     * @param serializer XmlSerializer
+     * @param res        ResResource
+     * @throws AndrolibException 自定义异常
+     * @throws IOException       IO异常
+     */
     protected void serializeBody(XmlSerializer serializer, ResResource res)
         throws AndrolibException, IOException {
     }
@@ -195,6 +207,7 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
     private final Integer mMin;
     private final Integer mMax;
     private final Boolean mL10n;
+
 
     public static final int BAG_KEY_ATTR_TYPE = 0x01000000;
     private static final int BAG_KEY_ATTR_MIN = 0x01000001;

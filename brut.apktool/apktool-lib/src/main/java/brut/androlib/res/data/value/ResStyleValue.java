@@ -26,8 +26,11 @@ import org.xmlpull.v1.XmlSerializer;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+/**
+ * styles.xml
+ */
 public class ResStyleValue extends ResBagValue implements
-        ResValuesXmlSerializable {
+    ResValuesXmlSerializable {
     ResStyleValue(ResReferenceValue parent,
                   Duo<Integer, ResScalarValue>[] items, ResValueFactory factory) {
         super(parent);
@@ -35,10 +38,18 @@ public class ResStyleValue extends ResBagValue implements
         mItems = new Duo[items.length];
         for (int i = 0; i < items.length; i++) {
             mItems[i] = new Duo<ResReferenceValue, ResScalarValue>(
-                    factory.newReference(items[i].m1, null), items[i].m2);
+                factory.newReference(items[i].m1, null), items[i].m2);
         }
     }
 
+    /**
+     * 序列化
+     *
+     * @param serializer XmlSerializer
+     * @param res        Res资源
+     * @throws IOException       IO异常
+     * @throws AndrolibException 自定义异常
+     */
     @Override
     public void serializeToResValuesXml(XmlSerializer serializer,
                                         ResResource res) throws IOException, AndrolibException {
@@ -54,7 +65,7 @@ public class ResStyleValue extends ResBagValue implements
 
             if (spec == null) {
                 LOGGER.fine(String.format("null reference: m1=0x%08x(%s), m2=0x%08x(%s)",
-                        mItems[i].m1.getRawIntValue(), mItems[i].m1.getType(), mItems[i].m2.getRawIntValue(), mItems[i].m2.getType()));
+                    mItems[i].m1.getRawIntValue(), mItems[i].m1.getType(), mItems[i].m2.getRawIntValue(), mItems[i].m2.getType()));
                 continue;
             }
 

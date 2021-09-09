@@ -25,6 +25,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
 
+/**
+ * Res标记标签属性的转换
+ */
 public class ResFlagsAttr extends ResAttr {
     ResFlagsAttr(ResReferenceValue parent, int type, Integer min, Integer max,
                  Boolean l10n, Duo<ResReferenceValue, ResIntValue>[] items) {
@@ -36,15 +39,23 @@ public class ResFlagsAttr extends ResAttr {
         }
     }
 
+    /**
+     * 格式化成XML
+     *
+     * @param value ResScalarValue
+     * @return String
+     * @throws AndrolibException 自定义异常
+     */
     @Override
     public String convertToResXmlFormat(ResScalarValue value)
-            throws AndrolibException {
-        if(value instanceof ResReferenceValue) {
+        throws AndrolibException {
+        if (value instanceof ResReferenceValue) {
             return value.encodeAsResXml();
         }
         if (!(value instanceof ResIntValue)) {
             return super.convertToResXmlFormat(value);
         }
+//        初始化mFlag 和 mZeroFlags
         loadFlags();
         int intVal = ((ResIntValue) value).getValue();
 
@@ -71,16 +82,24 @@ public class ResFlagsAttr extends ResAttr {
         return renderFlags(Arrays.copyOf(flagItems, flagsCount));
     }
 
+    /**
+     * 序列化body
+     *
+     * @param serializer XmlSerializer
+     * @param res        ResResource
+     * @throws AndrolibException 自定义异常
+     * @throws IOException       IO异常
+     */
     @Override
     protected void serializeBody(XmlSerializer serializer, ResResource res)
-            throws AndrolibException, IOException {
+        throws AndrolibException, IOException {
         for (int i = 0; i < mItems.length; i++) {
             FlagItem item = mItems[i];
 
             serializer.startTag(null, "flag");
             serializer.attribute(null, "name", item.getValue());
             serializer.attribute(null, "value",
-                    String.format("0x%08x", item.flag));
+                String.format("0x%08x", item.flag));
             serializer.endTag(null, "flag");
         }
     }
@@ -94,6 +113,13 @@ public class ResFlagsAttr extends ResAttr {
         return false;
     }
 
+    /**
+     * 读取 flags
+     *
+     * @param flags FlagItem[]
+     * @return String
+     * @throws AndrolibException 自定义异常
+     */
     private String renderFlags(FlagItem[] flags) throws AndrolibException {
         String ret = "";
         for (int i = 0; i < flags.length; i++) {
@@ -105,11 +131,17 @@ public class ResFlagsAttr extends ResAttr {
         return ret.substring(1);
     }
 
+    /**
+     * 加载标记，初始化mFlags
+     */
     private void loadFlags() {
         if (mFlags != null) {
             return;
         }
 
+        /**
+         * 标记为0的Item
+         */
         FlagItem[] zeroFlags = new FlagItem[mItems.length];
         int zeroFlagsCount = 0;
         FlagItem[] flags = new FlagItem[mItems.length];
@@ -131,14 +163,20 @@ public class ResFlagsAttr extends ResAttr {
             @Override
             public int compare(FlagItem o1, FlagItem o2) {
                 return Integer.valueOf(Integer.bitCount(o2.flag)).compareTo(
-                        Integer.bitCount(o1.flag));
+                    Integer.bitCount(o1.flag));
             }
         });
     }
 
     private final FlagItem[] mItems;
 
+    /**
+     * 标记为0的Item
+     */
     private FlagItem[] mZeroFlags;
+    /**
+     * 标记非0的Item
+     */
     private FlagItem[] mFlags;
 
     private static class FlagItem {

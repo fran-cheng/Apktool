@@ -24,6 +24,9 @@ import org.xmlpull.v1.XmlSerializer;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
+/**
+ * Strings.xml
+ */
 public class ResStringValue extends ResScalarValue {
 
     public ResStringValue(String value, int rawValue) {
@@ -34,26 +37,55 @@ public class ResStringValue extends ResScalarValue {
         super(type, rawValue, value);
     }
 
+    /**
+     * 解码xml的属性
+     *
+     * @return String
+     */
     @Override
     public String encodeAsResXmlAttr() {
         return checkIfStringIsNumeric(ResXmlEncoders.encodeAsResXmlAttr(mRawValue));
     }
 
+    /**
+     * 解码Item的值
+     *
+     * @return String
+     */
     @Override
     public String encodeAsResXmlItemValue() {
         return ResXmlEncoders.enumerateNonPositionalSubstitutionsIfRequired(ResXmlEncoders.encodeAsXmlValue(mRawValue));
     }
 
+    /**
+     * 解码XML的值
+     *
+     * @return String
+     */
     @Override
     public String encodeAsResXmlValue() {
         return ResXmlEncoders.encodeAsXmlValue(mRawValue);
     }
 
+
+    /**
+     * 抛出异常
+     *
+     * @return String
+     * @throws AndrolibException 自定义异常
+     */
     @Override
     protected String encodeAsResXml() throws AndrolibException {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * 连续的xml 标签属性
+     *
+     * @param serializer XmlSerializer
+     * @param res        ResResource
+     * @throws IOException IO异常
+     */
     @Override
     protected void serializeExtraXmlAttrs(XmlSerializer serializer, ResResource res) throws IOException {
         if (ResXmlEncoders.hasMultipleNonPositionalSubstitutions(mRawValue)) {
@@ -61,6 +93,12 @@ public class ResStringValue extends ResScalarValue {
         }
     }
 
+    /**
+     * 检查val是否是数字
+     *
+     * @param val String
+     * @return
+     */
     private String checkIfStringIsNumeric(String val) {
         if (val == null || val.isEmpty()) {
             return val;

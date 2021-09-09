@@ -25,6 +25,9 @@ import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 
+/**
+ * plurals.xml
+ */
 public class ResPluralsValue extends ResBagValue implements
         ResValuesXmlSerializable {
     ResPluralsValue(ResReferenceValue parent,

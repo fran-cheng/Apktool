@@ -22,10 +22,16 @@ import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResResSpec;
 
 /**
- * Res的参考值
+ * 引用类型
  */
 public class ResReferenceValue extends ResIntValue {
+    /**
+     * resource.arsc 里面的package
+     */
     private final ResPackage mPackage;
+    /**
+     * 是否@引用
+     */
     private final boolean mTheme;
 
     public ResReferenceValue(ResPackage package_, int value, String rawValue) {
@@ -39,6 +45,12 @@ public class ResReferenceValue extends ResIntValue {
         mTheme = theme;
     }
 
+    /**
+     * 解码成xml
+     *
+     * @return String
+     * @throws AndrolibException 自定义异常
+     */
     @Override
     protected String encodeAsResXml() throws AndrolibException {
         if (isNull()) {
@@ -52,11 +64,19 @@ public class ResReferenceValue extends ResIntValue {
         boolean newId = spec.hasDefaultResource() && spec.getDefaultResource().getValue() instanceof ResIdValue;
 
         // generate the beginning to fix @android
+//        生成初始修复@android
         String mStart = (mTheme ? '?' : '@') + (newId ? "+" : "");
 
         return mStart + spec.getFullName(mPackage, mTheme && spec.getType().getName().equals("attr"));
     }
 
+    /**
+     * 获取ResResSpec
+     * 通过value从Package里面获取ResResSpec
+     *
+     * @return ResResSpec
+     * @throws AndrolibException 自定义异常
+     */
     public ResResSpec getReferent() throws AndrolibException {
         try {
             return mPackage.getResTable().getResSpec(getValue());
@@ -65,10 +85,21 @@ public class ResReferenceValue extends ResIntValue {
         }
     }
 
+    /**
+     * 是否有mValue
+     *
+     * @return boolean
+     */
     public boolean isNull() {
         return mValue == 0;
     }
 
+    /**
+     * 是否有ResResSpec
+     *
+     * @return boolean
+     * @throws AndrolibException 自定义异常
+     */
     public boolean referentIsNull() throws AndrolibException {
         return getReferent() == null;
     }

@@ -38,6 +38,7 @@ public class ResIntValue extends ResScalarValue {
 
     /**
      * 获取int值
+     * 属性的value
      *
      * @return int
      */

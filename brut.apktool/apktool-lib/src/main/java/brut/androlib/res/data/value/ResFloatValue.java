@@ -16,6 +16,9 @@
  */
 package brut.androlib.res.data.value;
 
+/**
+ * float
+ */
 public class ResFloatValue extends ResScalarValue {
     private final float mValue;
 

@@ -19,6 +19,9 @@ package brut.androlib.res.data.value;
 import android.util.TypedValue;
 import brut.androlib.AndrolibException;
 
+/**
+ * fraction
+ */
 public class ResFractionValue extends ResIntValue {
     public ResFractionValue(int value, String rawValue) {
         super(value, rawValue, "fraction");

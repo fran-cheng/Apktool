@@ -16,9 +16,20 @@
  */
 package brut.androlib.res.data.value;
 
+/**
+ * bools.xml
+ */
 public class ResBoolValue extends ResScalarValue {
+    /**
+     * 值
+     */
     private final boolean mValue;
 
+    /**
+     * @param value       值
+     * @param rawIntValue 属性名原始的int值
+     * @param rawValue    原始的值
+     */
     public ResBoolValue(boolean value, int rawIntValue, String rawValue) {
         super("bool", rawIntValue, rawValue);
         this.mValue = value;
