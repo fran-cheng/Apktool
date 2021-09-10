@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 
 /**
  * ResPackage  ， resource.arsc 里面的package
+ * 保存着解码后的所有资源
  */
 public class ResPackage {
     /**

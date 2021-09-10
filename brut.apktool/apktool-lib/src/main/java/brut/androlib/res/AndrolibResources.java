@@ -145,8 +145,8 @@ final public class AndrolibResources {
      * @param resTable ResTable
      * @param id       id
      * @param frameTag 框架标识
-     * @return
-     * @throws AndrolibException
+     * @return ResPackage
+     * @throws AndrolibException 自定义异常
      */
     public ResPackage loadFrameworkPkg(ResTable resTable, int id, String frameTag)
         throws AndrolibException {
@@ -212,7 +212,7 @@ final public class AndrolibResources {
      *
      * @param resTable ResTable
      * @param filePath filePath
-     * @throws AndrolibException
+     * @throws AndrolibException 自定义异常
      */
     public void adjustPackageManifest(ResTable resTable, String filePath)
         throws AndrolibException {
@@ -556,53 +556,70 @@ final public class AndrolibResources {
 //        如使用 d8 将 Java 字节码编译为 DEX 字节码，以及使用 apksigner 为 APK 签名。
         cmd.add("link");
 
+//        指定已编译资源的输出路径。
         cmd.add("-o");
         cmd.add(apkFile.getAbsolutePath());
 
         if (mPackageId != null && !mSharedLibrary) {
+//            指定要用于应用的软件包 ID。
+//            除非与 --allow-reserved-package-id 结合使用，否则您指定的软件包 ID 必须大于或等于 0x7f。
             cmd.add("--package-id");
             cmd.add(mPackageId);
         }
 
         if (mSharedLibrary) {
+//          资源共享库
             cmd.add("--shared-lib");
         }
 
         if (mMinSdkVersion != null) {
+//            设置要用于 AndroidManifest.xml 的默认最低 SDK 版本。
             cmd.add("--min-sdk-version");
             cmd.add(mMinSdkVersion);
         }
 
         if (mTargetSdkVersion != null) {
+//            设置要用于 AndroidManifest.xml 的默认目标 SDK 版本。
             cmd.add("--target-sdk-version");
             cmd.add(checkTargetSdkVersionBounds());
         }
 
         if (mPackageRenamed != null) {
+//            重命名 AndroidManifest.xml 中的软件包。
             cmd.add("--rename-manifest-package");
             cmd.add(mPackageRenamed);
 
+//            更改插桩的目标软件包的名称。
+//           它应与 --rename-manifest-package 结合使用。
             cmd.add("--rename-instrumentation-target-package");
             cmd.add(mPackageRenamed);
         }
 
         if (mVersionCode != null) {
+//            指定没有版本代码时要注入 AndroidManifest.xml 中的版本代码（整数）
             cmd.add("--version-code");
             cmd.add(mVersionCode);
         }
 
         if (mVersionName != null) {
+//            指定没有版本名称时要注入 AndroidManifest.xml 中的版本名称。
             cmd.add("--version-name");
             cmd.add(mVersionName);
         }
 
         // Disable automatic changes
+//        禁用自动变化
+//        停用自动样式和布局 SDK 版本控制。
         cmd.add("--no-auto-version");
+//        停用矢量可绘制对象的自动版本控制。 仅当使用矢量可绘制对象库构建 APK 时，才能使用此选项。
         cmd.add("--no-version-vectors");
+//        停用转换资源的自动版本控制。 仅当使用转换支持库构建 APK 时，才能使用此选项。
         cmd.add("--no-version-transitions");
+//        禁止在兼容配置中自动删除具有相同值的重复资源。
         cmd.add("--no-resource-deduping");
 
         if (mSparseResources) {
+//            允许使用二进制搜索树对稀疏条目进行编码。 这有助于优化 APK 大小，但会降低资源检索性能。
             cmd.add("--enable-sparse-encoding");
         }
 
@@ -613,10 +630,13 @@ final public class AndrolibResources {
         if (apkOptions.doNotCompress != null && !customAapt) {
             // Use custom -e option to avoid limits on commandline length.
             // Can only be used when custom aapt binary is not used.
+//            使用自定义-e选项来避免对命令行长度的限制。
+//            只能在不使用自定义aapt二进制文件时使用。
             String extensionsFilePath = createDoNotCompressExtensionsFile(apkOptions).getAbsolutePath();
             cmd.add("-e");
             cmd.add(extensionsFilePath);
         } else if (apkOptions.doNotCompress != null) {
+//            指定您不想压缩的文件的扩展名。
             for (String file : apkOptions.doNotCompress) {
                 cmd.add("-0");
                 cmd.add(file);
@@ -624,31 +644,41 @@ final public class AndrolibResources {
         }
 
         if (!apkOptions.resourcesAreCompressed) {
+//            apktool.yml的compressionType
             cmd.add("-0");
             cmd.add("arsc");
         }
 
         if (include != null) {
             for (File file : include) {
+//                提供平台的 android.jar 或其他 APK（如 framework-res.apk）的路径，这在构建功能时可能很有用。
+//                如果您要在资源文件中使用带有 android 命名空间（例如 android:id）的属性，则必须使用此标记。
                 cmd.add("-I");
                 cmd.add(file.getPath());
             }
         }
 
+//        指定要构建的 Android 清单文件的路径。
+//        这是一个必需的标记，因为清单文件中包含有关您应用的基本信息（如软件包名称和应用 ID）。
         cmd.add("--manifest");
         cmd.add(manifest.getAbsolutePath());
 
         if (assetDir != null) {
+//            指定要包含在 APK 中的资产目录。
+//            您可以使用此目录存储未处理的原始文件。如需了解详情，请参阅@https://developer.android.google.cn/guide/topics/resources/providing-resources?hl=zh_cn#OriginalFiles。
             cmd.add("-A");
             cmd.add(assetDir.getAbsolutePath());
         }
 
         if (rawDir != null) {
+//            传递要链接的单个 .flat 文件，使用 overlay 语义，而不使用 <add-resource> 标记。
+//            如果您提供与现有文件重叠（扩展或修改现有文件）的资源文件，系统会使用最后提供的冲突资源。
             cmd.add("-R");
             cmd.add(rawDir.getAbsolutePath());
         }
 
         if (apkOptions.verbose) {
+//            启用详细日志记录。
             cmd.add("-v");
         }
 
@@ -657,6 +687,7 @@ final public class AndrolibResources {
         }
 
         try {
+//            执行命令
             OS.exec(cmd.toArray(new String[0]));
             LOGGER.fine("aapt2 link command ran: ");
             LOGGER.fine(cmd.toString());
@@ -698,7 +729,7 @@ final public class AndrolibResources {
         if (apkOptions.noCrunch) {
 //            在构建步骤中禁用资源文件的处理。
 //            停用 PNG 处理。
-//如果您已处理 PNG 文件，或者要创建不需要减小文件大小的调试 build，则可使用此选项。启用此选项可以加快执行速度，但会增大输出文件大小。
+//            如果您已处理 PNG 文件，或者要创建不需要减小文件大小的调试 build，则可使用此选项。启用此选项可以加快执行速度，但会增大输出文件大小。
             cmd.add("--no-crunch");
         }
         // force package id so that some frameworks build with correct id
@@ -714,10 +745,12 @@ final public class AndrolibResources {
             cmd.add("--shared-lib");
         }
         if (mMinSdkVersion != null) {
+//            最小SDK版本
             cmd.add("--min-sdk-version");
             cmd.add(mMinSdkVersion);
         }
         if (mTargetSdkVersion != null) {
+//            目标SDK版本
             cmd.add("--target-sdk-version");
 
             // Ensure that targetSdkVersion is between minSdkVersion/maxSdkVersion if
@@ -725,6 +758,7 @@ final public class AndrolibResources {
             cmd.add(checkTargetSdkVersionBounds());
         }
         if (mMaxSdkVersion != null) {
+//            最大SDK版本
             cmd.add("--max-sdk-version");
             cmd.add(mMaxSdkVersion);
 
@@ -734,18 +768,23 @@ final public class AndrolibResources {
             cmd.add(mMaxSdkVersion);
         }
         if (mPackageRenamed != null) {
+//            重命名manifest-package
             cmd.add("--rename-manifest-package");
             cmd.add(mPackageRenamed);
         }
         if (mVersionCode != null) {
+//            版本code
             cmd.add("--version-code");
             cmd.add(mVersionCode);
         }
         if (mVersionName != null) {
+//            版本name
             cmd.add("--version-name");
             cmd.add(mVersionName);
         }
+//        停用矢量可绘制对象的自动版本控制。 仅当使用矢量可绘制对象库构建 APK 时，才能使用此选项。
         cmd.add("--no-version-vectors");
+//        如果编译出来的文件已经存在，强制覆盖。
         cmd.add("-F");
         cmd.add(apkFile.getAbsolutePath());
 
@@ -756,36 +795,44 @@ final public class AndrolibResources {
         if (apkOptions.doNotCompress != null && !customAapt) {
             // Use custom -e option to avoid limits on commandline length.
             // Can only be used when custom aapt binary is not used.
+//            使用自定义-e选项来避免对命令行长度的限制。
+//            只能在不使用自定义aapt二进制文件时使用。
             String extensionsFilePath = createDoNotCompressExtensionsFile(apkOptions).getAbsolutePath();
             cmd.add("-e");
             cmd.add(extensionsFilePath);
         } else if (apkOptions.doNotCompress != null) {
             for (String file : apkOptions.doNotCompress) {
+//                不压缩
                 cmd.add("-0");
                 cmd.add(file);
             }
         }
 
         if (!apkOptions.resourcesAreCompressed) {
+//            不压缩
             cmd.add("-0");
             cmd.add("arsc");
         }
 
         if (include != null) {
             for (File file : include) {
+//                某个版本平台的android.jar的路径
                 cmd.add("-I");
                 cmd.add(file.getPath());
             }
         }
         if (resDir != null) {
+//            res文件夹路径
             cmd.add("-S");
             cmd.add(resDir.getAbsolutePath());
         }
         if (manifest != null) {
+//            AndroidManifest.xml的路径
             cmd.add("-M");
             cmd.add(manifest.getAbsolutePath());
         }
         if (assetDir != null) {
+//            assert文件夹的路径
             cmd.add("-A");
             cmd.add(assetDir.getAbsolutePath());
         }
@@ -793,6 +840,7 @@ final public class AndrolibResources {
             cmd.add(rawDir.getAbsolutePath());
         }
         try {
+//            执行命令
             OS.exec(cmd.toArray(new String[0]));
             LOGGER.fine("command ran: ");
             LOGGER.fine(cmd.toString());
@@ -836,6 +884,14 @@ final public class AndrolibResources {
         aapt1Package(apkFile, manifest, resDir, rawDir, assetDir, include, cmd, customAapt);
     }
 
+    /**
+     * 压缩成ZIP文件
+     *
+     * @param apkFile apkFile
+     * @param rawDir rawDir
+     * @param assetDir assetDir
+     * @throws AndrolibException 自定义异常
+     */
     public void zipPackage(File apkFile, File rawDir, File assetDir)
         throws AndrolibException {
 
@@ -988,6 +1044,14 @@ final public class AndrolibResources {
         }
     }
 
+    /**
+     * 生成public.xml文件
+     *
+     * @param pkg    ResPackage
+     * @param out    Directory
+     * @param serial XmlSerializer
+     * @throws AndrolibException 自定义异常
+     */
     private void generatePublicXml(ResPackage pkg, Directory out,
                                    XmlSerializer serial) throws AndrolibException {
         try {
@@ -1209,6 +1273,12 @@ final public class AndrolibResources {
         }
     }
 
+    /**
+     * publicizeResources 还在更新
+     *
+     * @param arscFile
+     * @throws AndrolibException
+     */
     public void publicizeResources(File arscFile) throws AndrolibException {
         byte[] data = new byte[(int) arscFile.length()];
 
@@ -1367,6 +1437,9 @@ final public class AndrolibResources {
     private boolean mSharedLibrary = false;
     private boolean mSparseResources = false;
 
+    /**
+     * 忽略的包
+     */
     private final static String[] IGNORED_PACKAGES = new String[]{
         "android", "com.htc", "com.lge", "com.lge.internal", "yi", "flyme", "air.com.adobe.appentry",
         "FFFFFFFFFFFFFFFFFFFFFF"};

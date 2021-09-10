@@ -27,6 +27,9 @@ import java.io.Writer;
  * Implementation of XmlSerializer interface from XmlPull V1 API. This
  * implementation is optimized for performance and low memory footprint.
  *
+ * 从XmlPull V1 API实现XmlSerializer接口。这
+ * 实现针对性能和低内存占用进行了优化。
+ *
  * <p>
  * Implemented features:
  * <ul>

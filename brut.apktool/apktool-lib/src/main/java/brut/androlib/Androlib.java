@@ -465,19 +465,32 @@ public class Androlib {
 
 //        构建dex文件
         buildSources(appDir);
+//        构建其他dex文件
         buildNonDefaultSources(appDir);
+//        修改manifest文件 将引用改为值
         buildManifestFile(appDir, manifest, manifestOriginal);
+//         构建resources.arsc，AndroidManifest.xml
         buildResources(appDir, meta.usesFramework);
+//         构建libs
         buildLibs(appDir);
+//         如果copyOriginalFiles 为true 拷贝原始文件
         buildCopyOriginalFiles(appDir);
+//         压缩成Zip
         buildApk(appDir, outFile);
 
         // we must go after the Apk is built, and copy the files in via Zip
         // this is because Aapt won't add files it doesn't know (ex unknown files)
+//        我们必须在构建Apk之后，并通过Zip复制文件
+//        这是因为Aapt不会添加它不知道的文件(ex unknown files)
+//        获取并拷贝未知文件
         buildUnknownFiles(appDir, outFile, meta);
 
         // we copied the AndroidManifest.xml to AndroidManifest.xml.orig so we can edit it
         // lets restore the unedited one, to not change the original
+//        我们将AndroidManifest.xml复制到AndroidManifest.xml。orig，以便我们可以编辑它
+//        让我们恢复未编辑的一个，不改变原来的
+
+//        因为上面buildManifestFile 改了，所以这里把他复原
         if (manifest.isFile() && manifest.exists() && manifestOriginal.isFile()) {
             try {
                 if (new File(appDir, "AndroidManifest.xml").delete()) {
@@ -490,10 +503,19 @@ public class Androlib {
         LOGGER.info("Built apk...");
     }
 
+    /**
+     * 构建AndroidManifest.xml
+     *
+     * @param appDir           appDir
+     * @param manifest         manifest
+     * @param manifestOriginal manifestOriginal
+     * @throws AndrolibException 自定义异常
+     */
     private void buildManifestFile(File appDir, File manifest, File manifestOriginal)
         throws AndrolibException {
 
         // If we decoded in "raw", we cannot patch AndroidManifest
+//        如果我们以“raw”解码，我们就不能给AndroidManifest打补丁
         if (new File(appDir, "resources.arsc").exists()) {
             return;
         }
@@ -503,6 +525,7 @@ public class Androlib {
                     manifestOriginal.delete();
                 }
                 FileUtils.copyFile(manifest, manifestOriginal);
+//                方法查找任何引用并将其替换为在 res/values/strings.xml file
                 ResXmlPatcher.fixingPublicAttrsInProviderAttributes(manifest);
             } catch (IOException ex) {
                 throw new AndrolibException(ex.getMessage());
@@ -523,6 +546,12 @@ public class Androlib {
         }
     }
 
+    /**
+     * 构建其他的dex
+     *
+     * @param appDir ExtFile
+     * @throws AndrolibException 自定义异常
+     */
     public void buildNonDefaultSources(ExtFile appDir)
         throws AndrolibException {
         try {
@@ -614,6 +643,7 @@ public class Androlib {
 
     /**
      * 回编资源生成 resources.arsc
+     * AndroidManifest.xml
      *
      * @param appDir        appDir
      * @param usesFramework usesFramework

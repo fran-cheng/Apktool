@@ -109,6 +109,14 @@ public final class ResXmlPatcher {
      * This finds any reference and replaces it with the literal value found in the
      * res/values/strings.xml file.
      *
+     * 在AndroidManifest.xml的provider值中任何@string引用都会中断
+     * * build，从而阻止应用程序安装。这是一个错误/错误
+     * 在AOSP中，公共资源不能成为内部权威属性的一部分
+     * 提供标签。
+     * <p>
+     * 方法查找任何引用并将其替换为在
+     * res/values/strings.xml file.
+     *
      * @param file File for AndroidManifest.xml
      */
     public static void fixingPublicAttrsInProviderAttributes(File file) {

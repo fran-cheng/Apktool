@@ -19,7 +19,7 @@ package brut.androlib.res.data;
 import java.util.logging.Logger;
 
 /**
- * Res配置的标记
+ * Res配置的标记 @https://developer.android.google.cn/guide/topics/resources/providing-resources
  * 可以根据标记获取“限定符”等
  */
 public class ResConfigFlags {
